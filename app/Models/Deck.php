@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Ranks;
 use App\Enums\Suits;
 
 final class Deck
@@ -12,26 +13,11 @@ final class Deck
     public function __construct()
     {
         $suits = Suits::cases();
-
-        $ranks = [
-            'ace',
-            'two',
-            'three',
-            'four',
-            'five',
-            'six',
-            'seven',
-            'eight',
-            'nine',
-            'ten',
-            'jack',
-            'queen',
-            'king',
-        ];
+        $ranks = Ranks::cases();
 
         foreach($suits as $suit) {
             foreach ($ranks as $rank) {
-                $this->cards[] = "$rank of $suit->value";
+                $this->cards[] = "$rank->value of $suit->value";
             }
         }
     }
