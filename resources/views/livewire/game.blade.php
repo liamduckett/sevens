@@ -3,7 +3,13 @@
 @endphp
 
 <div>
-    @foreach($deck->cards as $card)
-        <div>{{ $card }}</div>
+    @foreach($deck->hands as $hand)
+        <ul>
+            @foreach($hand as $card)
+                <li>
+                    {{ $card }}
+                </li>
+            @endforeach
+        </ul>
     @endforeach
 </div>
