@@ -8,7 +8,7 @@ use App\Enums\Suits;
 final class Deck
 {
     /** @var Array<string> $cards  */
-    public array $cards;
+    public array $cards = [];
 
     public function __construct()
     {
@@ -20,5 +20,7 @@ final class Deck
                 $this->cards[] = "$rank->value of $suit->value";
             }
         }
+
+        shuffle($this->cards);
     }
 }
