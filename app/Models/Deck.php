@@ -14,8 +14,6 @@ final class Deck
 
     public function __construct()
     {
-        $players = 4;
-
         $suits = Suits::cases();
         $ranks = Ranks::cases();
 
@@ -27,10 +25,20 @@ final class Deck
 
         shuffle($this->cards);
 
-        $hands = array_chunk($this->cards, 52 / $players);
+        $this->hands = $this->splitIntoHands(players: 4);
+    }
 
-        foreach($hands as $hand) {
-            $this->hands[] = new Hand($hand);
-        }
+    /**
+     * @param int $players
+     * @return array<Hand>
+     */
+    private function splitIntoHands(int $players): array
+    {
+        $cardChunks = array_chunk($this->cards, 52 / $players);
+
+        return array_map(
+            callback: fn(array $cardChunk) => new Hand($cardChunk),
+            array: $cardChunks,
+        );
     }
 }
