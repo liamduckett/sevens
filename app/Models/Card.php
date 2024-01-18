@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use App\Enums\Ranks;
-use App\Enums\Suits;
+use App\Enums\Rank;
+use App\Enums\Suit;
 use Livewire\Wireable;
 use Stringable;
 
 final class Card implements Stringable, Wireable
 {
     public function __construct(
-        public Suits $suit,
-        public Ranks $rank,
+        public Suit $suit,
+        public Rank $rank,
     ) {}
 
     public function __toString(): string

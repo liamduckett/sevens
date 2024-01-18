@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum Suits: string
+enum Suit: string
 {
     case DIAMONDS = 'diamonds';
     case CLUBS = 'clubs';

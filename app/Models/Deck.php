@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Enums\Ranks;
-use App\Enums\Suits;
+use App\Enums\Rank;
+use App\Enums\Suit;
 
 final class Deck
 {
@@ -12,8 +12,8 @@ final class Deck
 
     public function __construct()
     {
-        $suits = Suits::cases();
-        $ranks = Ranks::cases();
+        $suits = Suit::cases();
+        $ranks = Rank::cases();
 
         foreach($suits as $suit) {
             foreach ($ranks as $rank) {

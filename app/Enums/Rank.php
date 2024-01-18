@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum Ranks: string
+enum Rank: string
 {
     case ACE = 'ace';
     case TWO = 'two';
