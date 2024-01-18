@@ -9,8 +9,6 @@ final class Deck
 {
     /** @var array<string> $cards  */
     public array $cards = [];
-    /** @var array<Hand> $hands  */
-    public array $hands = [];
 
     public function __construct()
     {
@@ -24,17 +22,17 @@ final class Deck
         }
 
         shuffle($this->cards);
-
-        $this->hands = $this->splitIntoHands(players: 4);
     }
 
     /**
      * @param int $players
      * @return array<Hand>
      */
-    private function splitIntoHands(int $players): array
+    public static function splitIntoHands(int $players): array
     {
-        $cardChunks = array_chunk($this->cards, 52 / $players);
+        $deck = new Deck;
+
+        $cardChunks = array_chunk($deck->cards, 52 / $players);
 
         return array_map(
             callback: fn(array $cardChunk) => new Hand($cardChunk),

@@ -1,9 +1,9 @@
 @php
-    /** @var \App\Models\Deck $deck */
+    /** @var array<\App\Models\Hand> $hands  */
 @endphp
 
 <div>
-    @foreach($deck->hands as $hand)
+    @foreach($hands as $hand)
         <ul>
             @foreach($hand->cards as $card)
                 <li>
