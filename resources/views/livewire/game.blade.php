@@ -6,17 +6,24 @@
     @foreach($hands as $hand)
         <ul class="flex flex-wrap gap-4">
             @foreach($hand->cards as $card)
-                <div class="border-2 border-black rounded-3xl w-36 h-48 flex flex-col justify-between p-2">
-                    <div class="text-left">
-                        {{ $card->rank->value }}
+                @php
+                    $color = match($card->suit->color()) {
+                        'red' => 'text-red-500',
+                        'black' => 'text-black-500',
+                    }
+                @endphp
+
+                <div class="border-2 border-black rounded-3xl w-36 h-48 flex flex-col justify-between p-4 {{ $color }}">
+                    <div class="text-left font-bold text-xl">
+                        {{ $card->rank->symbol() }}
                     </div>
 
-                    <div class="text-center">
-                        {{ $card->suit->value }}
+                    <div class="text-center font-bold text-5xl">
+                        {{ $card->suit->symbol() }}
                     </div>
 
-                    <div class="text-right">
-                        {{ $card->rank->value }}
+                    <div class="text-right font-bold text-xl">
+                        {{ $card->rank->symbol() }}
                     </div>
                 </div>
             @endforeach
