@@ -6,7 +6,7 @@ use Livewire\Wireable;
 
 final class Hand implements Wireable
 {
-    /** @var Array<string> $cards  */
+    /** @var Array<Card> $cards  */
     public function __construct(public array $cards) {}
 
     public function toLivewire(): array

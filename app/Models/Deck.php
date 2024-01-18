@@ -7,7 +7,7 @@ use App\Enums\Suits;
 
 final class Deck
 {
-    /** @var array<string> $cards  */
+    /** @var array<Card> $cards  */
     public array $cards = [];
 
     public function __construct()
@@ -17,7 +17,7 @@ final class Deck
 
         foreach($suits as $suit) {
             foreach ($ranks as $rank) {
-                $this->cards[] = "$rank->value of $suit->value";
+                $this->cards[] = new Card($suit, $rank);
             }
         }
 
