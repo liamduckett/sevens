@@ -9,8 +9,8 @@ final class Deck
 {
     /** @var array<string> $cards  */
     public array $cards = [];
-    /** @var array<array<string>> $cards  */
-    public array $hands;
+    /** @var array<Hand> $hands  */
+    public array $hands = [];
 
     public function __construct()
     {
@@ -27,6 +27,10 @@ final class Deck
 
         shuffle($this->cards);
 
-        $this->hands = array_chunk($this->cards, 52 / $players);
+        $hands = array_chunk($this->cards, 52 / $players);
+
+        foreach($hands as $hand) {
+            $this->hands[] = new Hand($hand);
+        }
     }
 }

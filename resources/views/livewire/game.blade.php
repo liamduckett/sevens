@@ -5,7 +5,7 @@
 <div>
     @foreach($deck->hands as $hand)
         <ul>
-            @foreach($hand as $card)
+            @foreach($hand->cards as $card)
                 <li>
                     {{ $card }}
                 </li>
