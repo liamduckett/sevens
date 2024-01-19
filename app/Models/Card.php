@@ -14,6 +14,11 @@ final class Card implements Stringable, Wireable
         public Rank $rank,
     ) {}
 
+    public static function make(Suit $suit, Rank $rank): self
+    {
+        return new self($suit, $rank);
+    }
+
     public function __toString(): string
     {
         return "{$this->rank->value} of {$this->suit->value}";
@@ -26,6 +31,15 @@ final class Card implements Stringable, Wireable
             'rank' => $this->rank,
         ];
     }
+
+    public static function fromDto(array $dto): self
+    {
+        $suit = Suit::from($dto['suit']);
+        $rank = Rank::from($dto['rank']);
+
+        return new self($suit, $rank);
+    }
+
 
     public static function compare(): callable
     {
