@@ -4,8 +4,10 @@
 @endphp
 
 <div class="max-w-5xl mx-auto flex flex-col gap-20">
-    @foreach($hands as $hand)
-        <ul class="flex flex-wrap gap-4">
+    @foreach($hands as $player => $hand)
+        <ul class="flex flex-wrap gap-4 border-4 p-8 rounded-xl
+            {{ $player === $currentPlayer ? 'border-blue-400' : 'border-white' }}">
+
             @foreach($hand->cards as $card)
                 @php
                     $color = match($card->suit->color()) {
