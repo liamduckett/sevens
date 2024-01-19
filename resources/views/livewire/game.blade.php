@@ -1,5 +1,6 @@
 @php
     /** @var array<\App\Models\Hand> $hands  */
+    /** @var int $currentPlayer  */
 @endphp
 
 <div class="max-w-5xl mx-auto flex flex-col gap-20">

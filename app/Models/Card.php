@@ -19,6 +19,14 @@ final class Card implements Stringable, Wireable
         return "{$this->rank->value} of {$this->suit->value}";
     }
 
+    public function toDto(): array
+    {
+        return [
+            'suit' => $this->suit,
+            'rank' => $this->rank,
+        ];
+    }
+
     public static function compare(): callable
     {
         return function(Card $cardOne, Card $cardTwo) {
@@ -34,10 +42,7 @@ final class Card implements Stringable, Wireable
 
     public function toLivewire(): array
     {
-        return [
-            'suit' => $this->suit,
-            'rank' => $this->rank,
-        ];
+        return $this->toDto();
     }
 
     public static function fromLivewire($value): self
