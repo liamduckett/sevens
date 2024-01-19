@@ -19,6 +19,11 @@ final class Card implements Stringable, Wireable
         return "{$this->rank->value} of {$this->suit->value}";
     }
 
+    public function forComparison(): string
+    {
+        return "{$this->suit->value}-{$this->rank->value}";
+    }
+
     public function toLivewire(): array
     {
         return [
