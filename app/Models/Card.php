@@ -19,9 +19,17 @@ final class Card implements Stringable, Wireable
         return "{$this->rank->value} of {$this->suit->value}";
     }
 
-    public function forComparison(): string
+    public static function compare(): callable
     {
-        return "{$this->suit->value}-{$this->rank->value}";
+        return function(Card $cardOne, Card $cardTwo) {
+            // if different suits then do alphabetical suit
+            // if same suit then compare int of rank
+
+            return match($cardOne->suit === $cardTwo->suit) {
+                true  => $cardOne->rank->value <=> $cardTwo->rank->value,
+                false => $cardOne->suit->order() <=> $cardTwo->suit->order(),
+            };
+        };
     }
 
     public function toLivewire(): array

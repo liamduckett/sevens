@@ -14,15 +14,7 @@ final class Hand implements Wireable
 
     public function sort(): void
     {
-        usort($this->cards, function(Card $cardOne, Card $cardTwo) {
-            // if different suits then do alphabetical suit
-            // if same suit then compare int of rank
-
-            return match($cardOne->suit === $cardTwo->suit) {
-                true  => $cardOne->rank->value <=> $cardTwo->rank->value,
-                false => $cardOne->suit->order() <=> $cardTwo->suit->order(),
-            };
-        });
+        usort($this->cards, Card::compare());
     }
 
     public function toLivewire(): array
