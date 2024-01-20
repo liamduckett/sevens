@@ -50,23 +50,37 @@ class Game extends Component
 
         $card = Card::fromDto($card);
 
+        // TODO: a card should only be playable if it's in the hand of the current player
         if(! $this->board->cardIsPlayable($card)) {
             throw new \Exception("Unplayable card");
         }
 
         $this->board->play($card);
+        $this->currentPlayerHand()->removeCard($card);
 
-        // hand of current player
-        $currentPlayerHand = $this->hands[$this->currentPlayer];
-        $currentPlayerHand->removeCard($card);
-
-        $this->currentPlayer = $this->nextPlayer();
+        $this->nextPlayer();
     }
 
-    public function nextPlayer(): int {
+    public function knock(): void
+    {
+        $hand = $this->currentPlayerHand();
+
+        if($this->board->handIsPlayable($hand)) {
+            throw new \Exception("Playable hand");
+        }
+
+        $this->nextPlayer();
+    }
+
+    public function currentPlayerHand(): Hand
+    {
+        return $this->hands[$this->currentPlayer];
+    }
+
+    private function nextPlayer(): void {
         // array indexes are 0 through (PLAYERS - 1)
         // if next player would be too high, loop back to 0
-        return $this->currentPlayer + 1 === self::PLAYERS
+        $this->currentPlayer = $this->currentPlayer + 1 === self::PLAYERS
             ? 0
             : $this->currentPlayer + 1;
     }

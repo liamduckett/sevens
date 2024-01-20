@@ -35,11 +35,23 @@
         @endforeach
     </div>
 
-    <ul class="flex flex-wrap gap-3 p-8 rounded-xl justify-center">
-        @foreach($hands[$currentPlayer]->cards as $card)
-            <x-card :card="$card" :playable="$this->board->cardIsPlayable($card)"/>
-        @endforeach
-    </ul>
+    <div class="p-8">
+        @php
+            $hand = $this->currentPlayerHand();
+        @endphp
+
+        <div class="pb-4 flex justify-center">
+            <x-button wire:click="knock" :disabled="$this->board->handIsPlayable($hand)">
+                Knock
+            </x-button>
+        </div>
+
+        <ul class="flex flex-wrap gap-3 rounded-xl justify-center">
+            @foreach($hand->cards as $card)
+                <x-card :card="$card" :playable="$this->board->cardIsPlayable($card)"/>
+            @endforeach
+        </ul>
+    </div>
 
 {{--    @foreach($hands as $player => $hand)--}}
 {{--        <ul class="flex flex-wrap gap-3 border-4 p-8 rounded-xl justify-center--}}

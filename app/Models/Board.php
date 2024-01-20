@@ -25,8 +25,6 @@ final class Board implements Wireable
 
     public function cardIsPlayable(Card $card): bool
     {
-        // TODO: a card should only be playable if it's in the hand of the current player
-
         $startingCard = new Card(Suit::DIAMONDS, Rank::SEVEN);
 
         // when the board is empty only the starting card can be played
@@ -43,6 +41,15 @@ final class Board implements Wireable
             // if this card is above 7, then the number 1 below it must have been played
             1  => $this->suit($card->suit)->highest === $card->rank->value - 1,
         };
+    }
+
+    public function handIsPlayable(Hand $hand): bool
+    {
+        return array_reduce(
+            array: $hand->cards,
+            callback: fn(bool $carry, Card $card) => $carry or $this->cardIsPlayable($card),
+            initial: false,
+        );
     }
 
     public function play(Card $card): void
