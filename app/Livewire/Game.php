@@ -80,5 +80,15 @@ class Game extends Component
 
         $boardSuit->lowest = $boardSuit->min($card->rank->value);
         $boardSuit->highest = $boardSuit->max($card->rank->value);
+
+        $this->currentPlayer = $this->nextPlayer();
+    }
+
+    public function nextPlayer(): int {
+        // array indexes are 0 through (PLAYERS - 1)
+        // if next player would be too high, loop back to 0
+        return $this->currentPlayer + 1 === self::PLAYERS
+            ? 0
+            : $this->currentPlayer + 1;
     }
 }
