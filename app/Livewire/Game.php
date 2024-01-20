@@ -18,7 +18,7 @@ class Game extends Component
     /** @var array<Hand> $hands  */
     public array $hands;
     #[Locked]
-    public ?int $currentPlayerId;
+    public int $currentPlayerId;
     #[Locked]
     public Board $board;
     #[Locked]

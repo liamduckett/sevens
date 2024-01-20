@@ -1,6 +1,6 @@
 @php
     /** @var array<\App\Models\Hand> $hands  */
-    /** @var int $currentPlayer  */
+    /** @var int $currentPlayerId  */
     /** @var \App\Models\Board $board  */
     /** @var ?int $winner */
     /** @var array $names */
@@ -10,7 +10,7 @@
     <div class="flex gap-4 justify-center">
         @foreach($board->contents as $suit => $boardSuit)
             <div class="flex flex-col justify-center w-52">
-                <div class="text-center text-2xl font-semibold pb-2">
+                <div class="text-center text-2xl font-semibold pb-2 text-gray-700">
                     {{ $suit }}
                 </div>
 
@@ -48,7 +48,11 @@
             $hand = $this->currentPlayerHand();
         @endphp
 
-        <div class="pb-4 flex justify-center">
+        <div class="pb-4 flex justify-center items-center gap-10">
+            <div class="text-lg font-bold text-gray-700">
+                {{ $names[$currentPlayerId] }}
+            </div>
+
             <x-button wire:click.throttle.500ms="knock"
                       :disabled="$this->board->handIsPlayable($hand) || $this->hasWinner()">
                 Knock
@@ -61,14 +65,4 @@
             @endforeach
         </ul>
     </div>
-
-{{--    @foreach($hands as $player => $hand)--}}
-{{--        <ul class="flex flex-wrap gap-3 border-4 p-8 rounded-xl justify-center--}}
-{{--            {{ $player === $currentPlayer ? 'border-blue-400' : 'border-transparent' }}">--}}
-
-{{--            @foreach($hand->cards as $card)--}}
-{{--                <x-card :card="$card" :playable="$player === $currentPlayer && $this->board->cardIsPlayable($card)"/>--}}
-{{--            @endforeach--}}
-{{--        </ul>--}}
-{{--    @endforeach--}}
 </div>
