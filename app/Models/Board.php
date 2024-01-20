@@ -7,6 +7,7 @@ use Livewire\Wireable;
 
 final class Board implements Wireable
 {
+    /** @var array<BoardSuit> $contents */
     public function __construct(public array $contents) {}
 
     public static function make(): self
@@ -14,10 +15,10 @@ final class Board implements Wireable
         $nullSuit = ['lowest' => null, 'highest' => null];
 
         $contents = [
-            Suit::DIAMONDS->value => $nullSuit,
-            Suit::CLUBS->value => $nullSuit,
-            Suit::HEARTS->value => $nullSuit,
-            Suit::SPADES->value => $nullSuit,
+            Suit::DIAMONDS->value => BoardSuit::make(),
+            Suit::CLUBS->value => BoardSuit::make(),
+            Suit::HEARTS->value => BoardSuit::make(),
+            Suit::SPADES->value => BoardSuit::make(),
         ];
 
         return new self($contents);
@@ -25,9 +26,9 @@ final class Board implements Wireable
 
     /**
      * @param Suit $suit
-     * @return array{lowest: ?int, highest: ?int}
+     * @return BoardSuit
      */
-    public function suit(Suit $suit): array
+    public function suit(Suit $suit): BoardSuit
     {
         return $this->contents[$suit->value];
     }
@@ -42,7 +43,7 @@ final class Board implements Wireable
 
     public function missingSuit(Suit $suit): bool
     {
-        return $this->contents[$suit->value]['lowest'] === null;
+        return $this->suit($suit)->lowest === null;
     }
 
     public function toLivewire(): array

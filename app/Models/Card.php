@@ -63,7 +63,7 @@ final class Card implements Stringable, Wireable
     {
         return new self(
             $value['suit'],
-            $value['rank']
+            $value['rank'],
         );
     }
 }
