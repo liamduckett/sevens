@@ -4,10 +4,10 @@ namespace App\Enums;
 
 enum Suit: string
 {
-    case DIAMONDS = 'diamonds';
-    case CLUBS = 'clubs';
-    case HEARTS = 'hearts';
-    case SPADES = 'spades';
+    case DIAMONDS = 'Diamonds';
+    case CLUBS = 'Clubs';
+    case HEARTS = 'Hearts';
+    case SPADES = 'Spades';
 
     /**
      * When sorting a hand, we don't want two same colored suits next to each other

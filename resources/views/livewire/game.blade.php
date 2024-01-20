@@ -5,14 +5,14 @@
 @endphp
 
 <div class="max-w-5xl mx-auto flex flex-col gap-20 py-10">
-    <div class="flex gap-4">
+    <div class="flex gap-4 justify-center">
         @foreach($board->contents as $name => $boardSuit)
-            <div class="">
+            <div>
                 <div>
                     {{ $name }}
                 </div>
 
-                <div>
+                <div class="flex flex-col justify-center">
                     <div>{{ $boardSuit->lowest ?? 'N/A' }}</div>
                     <div>{{ $boardSuit->highest ?? 'N/A' }}</div>
                 </div>
@@ -25,35 +25,7 @@
             {{ $player === $currentPlayer ? 'border-blue-400' : 'border-transparent' }}">
 
             @foreach($hand->cards as $card)
-                @php
-                    $color = match($card->suit->color()) {
-                        'red' => 'text-red-500',
-                        'black' => 'text-black-500',
-                    };
-
-                    $playable = $player === $currentPlayer && $this->isPlayable($card);
-                @endphp
-
-                <div class="border-4 rounded-3xl p-2
-                     {{ $playable ? 'border-green-500 cursor-pointer' : 'border-transparent'}}"
-                     wire:click="playCard({{ json_encode($card->toDto()) }}, '{{ $playable }}')">
-
-                    <div class="border-2 border-black rounded-3xl w-36 h-48 flex flex-col justify-between p-4
-                         {{ $color }}">
-
-                        <div class="text-left font-bold text-xl">
-                            {{ $card->rank->symbol() }}
-                        </div>
-
-                        <div class="text-center font-bold text-5xl">
-                            {{ $card->suit->symbol() }}
-                        </div>
-
-                        <div class="text-right font-bold text-xl">
-                            {{ $card->rank->symbol() }}
-                        </div>
-                    </div>
-                </div>
+                <x-card :card="$card" :playable="$player === $currentPlayer && $this->isPlayable($card)"/>
             @endforeach
         </ul>
     @endforeach
