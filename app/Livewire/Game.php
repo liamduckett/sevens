@@ -50,6 +50,10 @@ class Game extends Component
             return;
         }
 
+        if($this->hasWinner()) {
+            throw new \Exception("Game already won");
+        }
+
         $card = Card::fromDto($card);
 
         // TODO: a card should only be playable if it's in the hand of the current player
@@ -67,6 +71,10 @@ class Game extends Component
 
     public function knock(): void
     {
+        if($this->hasWinner()) {
+            throw new \Exception("Game already won");
+        }
+
         $hand = $this->currentPlayerHand();
 
         if($this->board->handIsPlayable($hand)) {
