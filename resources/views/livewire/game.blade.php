@@ -46,9 +46,6 @@
             $hand = $this->currentPlayerHand();
         @endphp
 
-        @dump($this->board->handIsPlayable($hand))
-        @dump($this->hasWinner())
-
         <div class="pb-4 flex justify-center">
             <x-button wire:click.throttle.500ms="knock"
                       :disabled="$this->board->handIsPlayable($hand) || $this->hasWinner()">

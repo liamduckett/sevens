@@ -40,6 +40,11 @@ final class Card implements Stringable, Wireable
         return new self($suit, $rank);
     }
 
+    public function toJson(): string
+    {
+        return json_encode($this->toDto());
+    }
+
 
     public static function compare(): callable
     {
