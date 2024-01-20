@@ -81,6 +81,10 @@ class Game extends Component
         $boardSuit->lowest = $boardSuit->min($card->rank->value);
         $boardSuit->highest = $boardSuit->max($card->rank->value);
 
+        // hand of current player
+        $currentPlayerHand = $this->hands[$this->currentPlayer];
+        $currentPlayerHand->removeCard($card);
+
         $this->currentPlayer = $this->nextPlayer();
     }
 

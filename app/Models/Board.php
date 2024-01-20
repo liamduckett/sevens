@@ -12,8 +12,6 @@ final class Board implements Wireable
 
     public static function make(): self
     {
-        $nullSuit = ['lowest' => null, 'highest' => null];
-
         $contents = [
             Suit::DIAMONDS->value => BoardSuit::make(),
             Suit::CLUBS->value => BoardSuit::make(),

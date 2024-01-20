@@ -30,6 +30,14 @@ final class Hand implements Wireable
         );
     }
 
+    public function removeCard(Card $remove): void
+    {
+        $this->cards = array_filter(
+            array: $this->cards,
+            callback: fn(Card $card) => $card->toDto() !== $remove->toDto(),
+        );
+    }
+
     public function toLivewire(): array
     {
         return $this->cards;
