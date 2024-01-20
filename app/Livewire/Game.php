@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Enums\Rank;
 use App\Enums\Suit;
+use App\Models\Board;
 use App\Models\Card;
 use App\Models\Deck;
 use App\Models\Hand;
@@ -19,10 +20,11 @@ class Game extends Component
     /** @var array<Hand> $hands  */
     public array $hands;
     public int $currentPlayer;
-    public array $board = [];
+    public Board $board;
 
     public function mount(): void
     {
+        $this->board = Board::make();
         $this->hands = Deck::splitIntoHands(players: self::PLAYERS);
 
         // the first player is the one with the 7 diamonds
@@ -44,20 +46,19 @@ class Game extends Component
         $startingCard = new Card(Suit::DIAMONDS, Rank::SEVEN);
 
         // when the board is empty only the starting card can be played
-        if(empty($this->board)) {
+        if($this->board->isEmpty()) {
             return $card->toDto() === $startingCard->toDto();
         }
-        // once the board has at least the starting card,
-        else {
-            return match($card->rank->value <=> 7) {
-                // any seven that has not yet been played can be played
-                0  => ! isset($this->board[$card->suit->value]),
-                // if this card is below 7, then the number 1 above it must have been played
-                -1 => ($this->board[$card->suit->value]['lowest'] ?? null) === $card->rank->value + 1,
-                // if this card is above 7, then the number 1 below it must have been played
-                1  => ($this->board[$card->suit->value]['highest'] ?? null) === $card->rank->value - 1,
-            };
-        }
+
+        // once the board has at least one card...
+        return match($card->rank->value <=> 7) {
+            // any seven that has not yet been played can be played
+            0  => $this->board->missingSuit($card->suit),
+            // if this card is below 7, then the number 1 above it must have been played
+            -1 => $this->board->suit($card->suit)['lowest'] === $card->rank->value + 1,
+            // if this card is above 7, then the number 1 below it must have been played
+            1  => $this->board->suit($card->suit)['highest'] === $card->rank->value - 1,
+        };
     }
 
     public function playCard(array $card, bool $attempt): void
@@ -73,14 +74,14 @@ class Game extends Component
             throw new \Exception("Unplayable card");
         }
 
-        $this->board[$card->suit->value]['lowest'] = min(
+        $this->board->contents[$card->suit->value]['lowest'] = min(
             $card->rank->value,
-            $this->board[$card->suit->value]['lowest'] ?? PHP_INT_MAX,
+            $this->board->suit($card->suit)['lowest'] ?? PHP_INT_MAX,
         );
 
-        $this->board[$card->suit->value]['highest'] = max(
+        $this->board->contents[$card->suit->value]['highest'] = max(
             $card->rank->value,
-            $this->board[$card->suit->value]['highest'] ?? 0,
+            $this->board->suit($card->suit)['highest'] ?? 0,
         );
     }
 }

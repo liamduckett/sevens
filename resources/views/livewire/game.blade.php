@@ -4,11 +4,6 @@
 @endphp
 
 <div class="max-w-5xl mx-auto flex flex-col gap-20 py-10">
-    @dump($board['diamonds'] ?? [])
-    @dump($board['clubs'] ?? [])
-    @dump($board['hearts'] ?? [])
-    @dump($board['spades'] ?? [])
-
     @foreach($hands as $player => $hand)
         <ul class="flex flex-wrap gap-3 border-4 p-8 rounded-xl justify-center
             {{ $player === $currentPlayer ? 'border-blue-400' : 'border-transparent' }}">
