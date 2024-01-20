@@ -35,13 +35,19 @@
         @endforeach
     </div>
 
-    @foreach($hands as $player => $hand)
-        <ul class="flex flex-wrap gap-3 border-4 p-8 rounded-xl justify-center
-            {{ $player === $currentPlayer ? 'border-blue-400' : 'border-transparent' }}">
+    <ul class="flex flex-wrap gap-3 p-8 rounded-xl justify-center">
+        @foreach($hands[$currentPlayer]->cards as $card)
+            <x-card :card="$card" :playable="$this->isPlayable($card)"/>
+        @endforeach
+    </ul>
 
-            @foreach($hand->cards as $card)
-                <x-card :card="$card" :playable="$player === $currentPlayer && $this->isPlayable($card)"/>
-            @endforeach
-        </ul>
-    @endforeach
+{{--    @foreach($hands as $player => $hand)--}}
+{{--        <ul class="flex flex-wrap gap-3 border-4 p-8 rounded-xl justify-center--}}
+{{--            {{ $player === $currentPlayer ? 'border-blue-400' : 'border-transparent' }}">--}}
+
+{{--            @foreach($hand->cards as $card)--}}
+{{--                <x-card :card="$card" :playable="$player === $currentPlayer && $this->isPlayable($card)"/>--}}
+{{--            @endforeach--}}
+{{--        </ul>--}}
+{{--    @endforeach--}}
 </div>
