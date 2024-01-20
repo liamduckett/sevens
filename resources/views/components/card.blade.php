@@ -1,4 +1,4 @@
-@props(['card', 'playable'])
+@props(['card', 'playable' => false])
 
 @php
     /** @var \App\Models\Card $card */
