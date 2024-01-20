@@ -40,7 +40,12 @@ final class Hand implements Wireable
 
     public function isEmpty(): bool
     {
-        return count($this->cards) === 0;
+        return $this->count() === 0;
+    }
+
+    public function count(): int
+    {
+        return count($this->cards);
     }
 
     public function toLivewire(): array

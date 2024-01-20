@@ -7,7 +7,7 @@
 @endphp
 
 <div class="max-w-5xl mx-auto flex flex-col gap-10 py-10">
-    <x-board :board="$board"/>
+    <x-board :board="$board" :hands="$hands" :names="$names"/>
 
     @if($winner)
         <div class="text-green-700 font-semibold text-3xl text-center">
