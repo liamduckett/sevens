@@ -38,6 +38,11 @@ final class Hand implements Wireable
         );
     }
 
+    public function isEmpty(): bool
+    {
+        return count($this->cards) === 0;
+    }
+
     public function toLivewire(): array
     {
         return $this->cards;

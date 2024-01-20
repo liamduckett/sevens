@@ -4,7 +4,7 @@
     /** @var \App\Models\Board $board  */
 @endphp
 
-<div class="max-w-5xl mx-auto flex flex-col gap-20 py-10">
+<div class="max-w-5xl mx-auto flex flex-col gap-10 py-10">
     <div class="flex gap-4 justify-center">
         @foreach($board->contents as $name => $boardSuit)
             <div class="flex flex-col justify-center w-52">
@@ -34,6 +34,12 @@
             </div>
         @endforeach
     </div>
+
+    @if($this->winner)
+        <div class="text-green-700 font-semibold text-3xl text-center">
+            Player {{ $this->winner }} has won!
+        </div>
+    @endif
 
     <div class="p-8">
         @php

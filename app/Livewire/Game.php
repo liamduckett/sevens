@@ -2,8 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Enums\Rank;
-use App\Enums\Suit;
 use App\Models\Board;
 use App\Models\Card;
 use App\Models\Deck;
@@ -19,8 +17,12 @@ class Game extends Component
     #[Locked]
     /** @var array<Hand> $hands  */
     public array $hands;
+    #[Locked]
     public int $currentPlayer;
+    #[Locked]
     public Board $board;
+    #[Locked]
+    public ?int $winner = null;
 
     public function mount(): void
     {
@@ -58,7 +60,26 @@ class Game extends Component
         $this->board->play($card);
         $this->currentPlayerHand()->removeCard($card);
 
+        $this->checkForWinner();
+
         $this->nextPlayer();
+    }
+
+    private function checkForWinner(): void
+    {
+        $winners = array_filter(
+            $this->hands,
+            fn(Hand $hand) => $hand->isEmpty(),
+        );
+
+        if(count($winners) > 1) {
+            throw new \Exception("More than one winner");
+        }
+
+        if(count($winners) === 1) {
+            $winners = array_keys($winners);
+            $this->winner = $winners[0];
+        }
     }
 
     public function knock(): void
