@@ -46,15 +46,19 @@
             $hand = $this->currentPlayerHand();
         @endphp
 
+        @dump($this->board->handIsPlayable($hand))
+        @dump($this->hasWinner())
+
         <div class="pb-4 flex justify-center">
-            <x-button wire:click="knock" :disabled="$this->board->handIsPlayable($hand)">
+            <x-button wire:click.throttle.500ms="knock"
+                      :disabled="$this->board->handIsPlayable($hand) || $this->hasWinner()">
                 Knock
             </x-button>
         </div>
 
         <ul class="flex flex-wrap gap-3 rounded-xl justify-center">
             @foreach($hand->cards as $card)
-                <x-card :card="$card" :playable="$this->board->cardIsPlayable($card)"/>
+                <x-card :card="$card" :playable="$this->board->cardIsPlayable($card) && $this->hasNoWinner()"/>
             @endforeach
         </ul>
     </div>

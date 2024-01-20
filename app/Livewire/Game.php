@@ -65,23 +65,6 @@ class Game extends Component
         $this->nextPlayer();
     }
 
-    private function checkForWinner(): void
-    {
-        $winners = array_filter(
-            $this->hands,
-            fn(Hand $hand) => $hand->isEmpty(),
-        );
-
-        if(count($winners) > 1) {
-            throw new \Exception("More than one winner");
-        }
-
-        if(count($winners) === 1) {
-            $winners = array_keys($winners);
-            $this->winner = $winners[0];
-        }
-    }
-
     public function knock(): void
     {
         $hand = $this->currentPlayerHand();
@@ -98,11 +81,38 @@ class Game extends Component
         return $this->hands[$this->currentPlayer];
     }
 
+    public function hasWinner(): bool
+    {
+        return $this->winner !== null;
+    }
+
+    public function hasNoWinner(): bool
+    {
+        return ! $this->hasWinner();
+    }
+
     private function nextPlayer(): void {
         // array indexes are 0 through (PLAYERS - 1)
         // if next player would be too high, loop back to 0
         $this->currentPlayer = $this->currentPlayer + 1 === self::PLAYERS
             ? 0
             : $this->currentPlayer + 1;
+    }
+
+    private function checkForWinner(): void
+    {
+        $winners = array_filter(
+            $this->hands,
+            fn(Hand $hand) => $hand->isEmpty(),
+        );
+
+        if(count($winners) > 1) {
+            throw new \Exception("More than one winner");
+        }
+
+        if(count($winners) === 1) {
+            $winners = array_keys($winners);
+            $this->winner = $winners[0];
+        }
     }
 }

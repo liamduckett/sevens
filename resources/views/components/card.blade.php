@@ -11,7 +11,7 @@
 @endphp
 
 <div class="border-4 rounded-3xl p-2 {{ $playable ? 'border-green-500 cursor-pointer' : 'border-transparent'}}"
-     wire:click="playCard({{ json_encode($card->toDto()) }}, '{{ $playable }}')">
+     wire:click.throttle.500ms="playCard({{ json_encode($card->toDto()) }}, '{{ $playable }}')">
 
     <div class="border-2 border-black rounded-3xl w-36 h-48 flex flex-col justify-between p-4 {{ $color }}">
         <div class="text-left font-bold text-xl">
