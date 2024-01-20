@@ -23,7 +23,7 @@
                             $highestCard = new \App\Models\Card($suit, $highestRank);
                         @endphp
 
-                        {{-- only show 2 cards, if they're the same --}}
+                        {{-- only show 2 cards, if they're not the same --}}
                         @if($lowestRank !== $highestRank)
                             <x-card :card="$highestCard"/>
                         @endif
@@ -37,7 +37,7 @@
 
     <ul class="flex flex-wrap gap-3 p-8 rounded-xl justify-center">
         @foreach($hands[$currentPlayer]->cards as $card)
-            <x-card :card="$card" :playable="$this->isPlayable($card)"/>
+            <x-card :card="$card" :playable="$this->board->cardIsPlayable($card)"/>
         @endforeach
     </ul>
 
@@ -46,7 +46,7 @@
 {{--            {{ $player === $currentPlayer ? 'border-blue-400' : 'border-transparent' }}">--}}
 
 {{--            @foreach($hand->cards as $card)--}}
-{{--                <x-card :card="$card" :playable="$player === $currentPlayer && $this->isPlayable($card)"/>--}}
+{{--                <x-card :card="$card" :playable="$player === $currentPlayer && $this->board->cardIsPlayable($card)"/>--}}
 {{--            @endforeach--}}
 {{--        </ul>--}}
 {{--    @endforeach--}}

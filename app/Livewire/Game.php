@@ -41,28 +41,6 @@ class Game extends Component
         return view('livewire.game');
     }
 
-    public function isPlayable(Card $card): bool
-    {
-        // TODO: a card should only be playable if it's in the hand of the current player
-
-        $startingCard = new Card(Suit::DIAMONDS, Rank::SEVEN);
-
-        // when the board is empty only the starting card can be played
-        if($this->board->isEmpty()) {
-            return $card->toDto() === $startingCard->toDto();
-        }
-
-        // once the board has at least one card...
-        return match($card->rank->value <=> 7) {
-            // any seven that has not yet been played can be played
-            0  => $this->board->missingSuit($card->suit),
-            // if this card is below 7, then the number 1 above it must have been played
-            -1 => $this->board->suit($card->suit)->lowest === $card->rank->value + 1,
-            // if this card is above 7, then the number 1 below it must have been played
-            1  => $this->board->suit($card->suit)->highest === $card->rank->value - 1,
-        };
-    }
-
     public function playCard(array $card, bool $attempt): void
     {
         // a bit hacky - workaround to remove the need to conditionally add wire:click="playCard"
@@ -72,7 +50,7 @@ class Game extends Component
 
         $card = Card::fromDto($card);
 
-        if(! $this->isPlayable($card)) {
+        if(! $this->board->cardIsPlayable($card)) {
             throw new \Exception("Unplayable card");
         }
 
