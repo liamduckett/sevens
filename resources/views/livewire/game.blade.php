@@ -2,20 +2,22 @@
     /** @var array<\App\Models\Hand> $hands  */
     /** @var int $currentPlayer  */
     /** @var \App\Models\Board $board  */
+    /** @var ?int $winner */
+    /** @var array $names */
 @endphp
 
 <div class="max-w-5xl mx-auto flex flex-col gap-10 py-10">
     <div class="flex gap-4 justify-center">
-        @foreach($board->contents as $name => $boardSuit)
+        @foreach($board->contents as $suit => $boardSuit)
             <div class="flex flex-col justify-center w-52">
                 <div class="text-center text-2xl font-semibold pb-2">
-                    {{ $name }}
+                    {{ $suit }}
                 </div>
 
                 <div class="flex flex-col justify-center h-full items-center">
                     @if($boardSuit->lowest !== null)
                         @php
-                            $suit = \App\Enums\Suit::from($name);
+                            $suit = \App\Enums\Suit::from($suit);
                             $lowestRank = \App\Enums\Rank::from($boardSuit->lowest);
                             $highestRank = \App\Enums\Rank::from($boardSuit->highest);
 
@@ -35,9 +37,9 @@
         @endforeach
     </div>
 
-    @if($this->winner)
+    @if($winner)
         <div class="text-green-700 font-semibold text-3xl text-center">
-            Player {{ $this->winner }} has won!
+            {{ $names[$winner] }} has won!
         </div>
     @endif
 

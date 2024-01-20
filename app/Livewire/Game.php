@@ -18,16 +18,18 @@ class Game extends Component
     /** @var array<Hand> $hands  */
     public array $hands;
     #[Locked]
-    public int $currentPlayer;
+    public ?int $currentPlayerId;
     #[Locked]
     public Board $board;
     #[Locked]
     public ?int $winner = null;
+    #[Locked]
+    public array $names = [1 => 'Liam', 2 => 'Sam', 3 => 'Sharon', 4 => 'Greg'];
 
     public function mount(): void
     {
         $this->board = Board::make();
-        $this->hands = Deck::splitIntoHands(players: self::PLAYERS);
+        $this->hands = Deck::splitIntoHands(players: self::PLAYERS, names: $this->names);
 
         // the first player is the one with the 7 diamonds
         $startingHand = array_filter(
@@ -35,7 +37,7 @@ class Game extends Component
             fn(Hand $hand) => $hand->hasStartingCard(),
         );
 
-        $this->currentPlayer = array_key_first($startingHand);
+        $this->currentPlayerId = array_key_first($startingHand);
     }
 
     public function render(): View
@@ -86,7 +88,7 @@ class Game extends Component
 
     public function currentPlayerHand(): Hand
     {
-        return $this->hands[$this->currentPlayer];
+        return $this->hands[$this->currentPlayerId];
     }
 
     public function hasWinner(): bool
@@ -100,11 +102,11 @@ class Game extends Component
     }
 
     private function nextPlayer(): void {
-        // array indexes are 0 through (PLAYERS - 1)
-        // if next player would be too high, loop back to 0
-        $this->currentPlayer = $this->currentPlayer + 1 === self::PLAYERS
-            ? 0
-            : $this->currentPlayer + 1;
+        // array indexes are 1 through PLAYERS
+        // if next player would be too high, loop back to 1
+        $this->currentPlayerId = $this->currentPlayerId === self::PLAYERS
+            ? 1
+            : $this->currentPlayerId + 1;
     }
 
     private function checkForWinner(): void

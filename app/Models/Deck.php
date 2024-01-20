@@ -26,13 +26,17 @@ final class Deck
 
     /**
      * @param int $players
+     * @param array<string> $names
      * @return array<Hand>
      */
-    public static function splitIntoHands(int $players): array
+    public static function splitIntoHands(int $players, array $names): array
     {
+        $ids = array_keys($names);
+
         $deck = new Deck;
 
         $cardChunks = array_chunk($deck->cards, 52 / $players);
+        $cardChunks = array_combine($ids, $cardChunks);
 
         return array_map(
             callback: fn(array $cardChunk) => new Hand($cardChunk),
