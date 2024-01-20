@@ -22,6 +22,17 @@ final class Board implements Wireable
         return new self($contents);
     }
 
+    public function play(Card $card): void
+    {
+        $boardSuit = $this->suit($card->suit);
+
+        match($card->rank->value <=> 7) {
+            0  => $boardSuit->setMinAndMax($card),
+            -1 => $boardSuit->setMin($card),
+            1  => $boardSuit->setMax($card),
+        };
+    }
+
     /**
      * @param Suit $suit
      * @return BoardSuit

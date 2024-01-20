@@ -76,10 +76,7 @@ class Game extends Component
             throw new \Exception("Unplayable card");
         }
 
-        $boardSuit = $this->board->suit($card->suit);
-
-        $boardSuit->lowest = $boardSuit->min($card->rank->value);
-        $boardSuit->highest = $boardSuit->max($card->rank->value);
+        $this->board->play($card);
 
         // hand of current player
         $currentPlayerHand = $this->hands[$this->currentPlayer];

@@ -13,14 +13,20 @@ final class BoardSuit implements Wireable
         return new self($lowest, $highest);
     }
 
-    public function min(int $value): int
+    public function setMin(Card $card): void
     {
-        return min($value, $this->lowest ?? PHP_INT_MAX);
+        $this->lowest = $card->rank->value;
     }
 
-    public function max(int $value): int
+    public function setMax(Card $card): void
     {
-        return max($value, $this->lowest ?? 0);
+        $this->highest = $card->rank->value;
+    }
+
+    public function setMinAndMax(Card $card): void
+    {
+        $this->lowest = $card->rank->value;
+        $this->highest = $card->rank->value;
     }
 
     public function toLivewire(): array
