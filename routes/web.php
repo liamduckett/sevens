@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Game;
+use App\Livewire\Lobby;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,3 +16,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', Game::class);
+Route::get('/start', Lobby::class);
