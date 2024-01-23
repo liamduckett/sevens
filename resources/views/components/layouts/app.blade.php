@@ -14,14 +14,17 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 window.Echo.channel('lobby')
-                    .listen('GameStarted', () => {
-                        console.log('GameStarted');
-                    })
                     .listen('PlayerJoined', () => {
-                        console.log('PlayerJoined');
+                        // console.log('PlayerJoined');
                     })
                     .listen('PlayerLeft', () => {
-                        console.log('PlayerLeft');
+                        // console.log('PlayerLeft');
+                    })
+                    .listen('GameStarted', () => {
+                        // console.log('GameStarted');
+                    })
+                    .listen('TurnTaken', () => {
+                        // console.log('TurnTaken');
                     })
                 ;
             });

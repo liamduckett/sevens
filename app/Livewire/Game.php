@@ -2,11 +2,14 @@
 
 namespace App\Livewire;
 
+use App\Events\TurnTaken;
 use App\Models\Board;
 use App\Models\Card;
 use App\Models\Deck;
 use App\Models\Hand;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Request;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
@@ -24,25 +27,59 @@ class Game extends Component
     #[Locked]
     public ?int $winner = null;
     #[Locked]
-    public array $names = [1 => 'Liam', 2 => 'Sam', 3 => 'Sharon', 4 => 'Greg'];
+    public array $names = [];
+    #[Locked]
+    public string $code;
 
     public function mount(): void
     {
-        $this->board = Board::make();
-        $this->hands = Deck::splitIntoHands(players: self::PLAYERS, names: $this->names);
+        // TODO: gracefully handle no code passed!
+        $this->code = Request::get('code');
+        $this->names = Cache::get("players.$this->code") ?? [];
 
-        // the first player is the one with the 7 diamonds
-        $startingHand = array_filter(
-            $this->hands,
-            fn(Hand $hand) => $hand->hasStartingCard(),
-        );
+        // TODO: neaten
+        // if game has already been set up!
+        if($hands = Cache::get("hands.$this->code")) {
+            $this->hands = $hands;
+            $this->currentPlayerId = Cache::get("currentPlayerId.$this->code");
+            $this->board = Cache::get("board.$this->code");
+        } else {
+            $this->board = Board::make();
+            $this->hands = Deck::splitIntoHands(players: self::PLAYERS, names: $this->names);
 
-        $this->currentPlayerId = array_key_first($startingHand);
+            // the first player is the one with the 7 diamonds
+            $startingHand = array_filter(
+                $this->hands,
+                fn(Hand $hand) => $hand->hasStartingCard(),
+            );
+
+            $this->currentPlayerId = array_key_first($startingHand);
+
+            Cache::put("hands.$this->code", $this->hands);
+            Cache::put("currentPlayerId.$this->code", $this->currentPlayerId);
+            Cache::put("board.$this->code", $this->board);
+        }
     }
 
     public function render(): View
     {
+        $this->hands = Cache::get("hands.$this->code");
+        $this->currentPlayerId = Cache::get("currentPlayerId.$this->code");
+        $this->board = Cache::get("board.$this->code");
+
         return view('livewire.game');
+    }
+
+    public function getListeners(): array
+    {
+        return [
+            "echo:lobby,TurnTaken" => 'reload',
+        ];
+    }
+
+    public function reload(): void
+    {
+        $this->render();
     }
 
     public function playCard(array $card, bool $attempt): void
@@ -102,11 +139,17 @@ class Game extends Component
     }
 
     private function nextPlayer(): void {
-        // array indexes are 1 through PLAYERS
+        // array indexes are 0 through (PLAYERS - 1)
         // if next player would be too high, loop back to 1
-        $this->currentPlayerId = $this->currentPlayerId === self::PLAYERS
-            ? 1
+        $this->currentPlayerId = $this->currentPlayerId === self::PLAYERS - 1
+            ? 0
             : $this->currentPlayerId + 1;
+
+        TurnTaken::dispatch();
+
+        Cache::put("hands.$this->code", $this->hands);
+        Cache::put("currentPlayerId.$this->code", $this->currentPlayerId);
+        Cache::put("board.$this->code", $this->board);
     }
 
     private function checkForWinner(): void
