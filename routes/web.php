@@ -2,6 +2,7 @@
 
 use App\Livewire\Game;
 use App\Livewire\Lobby;
+use App\Livewire\SinglePlayerGame;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get('/single', SinglePlayerGame::class);
 
 Route::get('/game', Game::class);
 Route::get('/start', Lobby::class);
