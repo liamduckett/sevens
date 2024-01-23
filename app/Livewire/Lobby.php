@@ -3,15 +3,14 @@
 namespace App\Livewire;
 
 use App\Events\GameStarted;
-use App\Events\PlayerJoined;
 use App\Events\PlayerLeft;
+use App\Storage\GameStorage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Lobby extends Component
@@ -28,23 +27,19 @@ class Lobby extends Component
     public function mount(): void
     {
         $this->playerId = $this->getPlayerId();
+
         $this->code = $this->getCode();
-        $this->players = Cache::get("players.$this->code") ?? [];
+        $gameStorage = new GameStorage(code: $this->code);
+        $this->players = $gameStorage->players;
 
-        Session::put('code', $this->code);
-
-        if(!in_array($this->playerId, $this->players) and count($this->players) < 4) {
-            $this->players[] = $this->playerId;
-            Cache::put("players.$this->code", $this->players);
-            PlayerJoined::dispatch();
-        }
-
-        $this->host = $this->players[0] === $this->playerId;
+        $this->players = $gameStorage->addPlayerIfApplicable($this->playerId);
+        $this->host = $gameStorage->isHost($this->playerId);
     }
 
     public function render(): View
     {
-        $this->players = Cache::get("players.$this->code") ?? [];
+        $gameStorage = new GameStorage(code: $this->code);
+        $this->players = $gameStorage->players;
         return view('livewire.lobby');
     }
 
@@ -65,7 +60,7 @@ class Lobby extends Component
     public function leave(): void
     {
         $this->players = array_diff($this->players, [$this->playerId]);
-        Cache::put("players.$this->code", $this->players);
+        Cache::put("games.$this->code.players", $this->players);
         PlayerLeft::dispatch();
         $this->redirect('/lobby');
     }
@@ -80,9 +75,9 @@ class Lobby extends Component
         $this->redirect("/game?code=$this->code");
     }
 
-    private function getCode(): ?string
+    private function getCode(): string
     {
-        $code = Request::get('code') ?? Session::get('code');
+        $code = Request::get('code');
 
         if(strlen($code) !== 4 or !ctype_alnum($code)) {
             $code = Str::random(length: 4);

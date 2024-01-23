@@ -36,7 +36,7 @@ class Game extends Component
     {
         // TODO: gracefully handle no code passed!
         $this->code = Request::get('code');
-        $this->names = Cache::get("players.$this->code") ?? [];
+        $this->names = Cache::get("games.$this->code.players") ?? [];
 
         // TODO: neaten
         // if game has already been set up!
