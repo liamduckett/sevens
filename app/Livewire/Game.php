@@ -10,6 +10,7 @@ use App\Models\Hand;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
@@ -126,6 +127,15 @@ class Game extends Component
     public function currentPlayerHand(): Hand
     {
         return $this->hands[$this->currentPlayerId];
+    }
+
+    public function myHand(): Hand
+    {
+        //dd(Session::get('playerId'));
+        $hand = array_search(Session::get('playerId'), $this->names);
+        //dd($this->hands[$hand]);
+
+        return $this->hands[$hand];
     }
 
     public function hasWinner(): bool

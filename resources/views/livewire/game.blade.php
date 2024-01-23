@@ -17,20 +17,19 @@
 
     <div class="p-8">
         @php
-            $hand = $this->currentPlayerHand();
+            $hand = $this->myHand();
+            $isCurrentPlayer = $names[$currentPlayerId] === Session::get('playerId');
         @endphp
 
         <div class="pb-4 flex justify-center items-center gap-10">
             <div class="text-lg font-bold text-gray-700">
-                {{ $names[$currentPlayerId] }}
+                {{ Session::get('playerId') }}
+
+                it is {{ $names[$currentPlayerId] }}'s turn
             </div>
 
-            @php
-                $isCurrentPlayer = $names[$currentPlayerId] === Session::get('playerId');
-            @endphp
-
             <x-button wire:click.throttle.500ms="knock"
-                      :disabled="$this->board->handIsPlayable($hand) || $this->hasWinner() || $isCurrentPlayer">
+                      :disabled="$this->board->handIsPlayable($hand) || $this->hasWinner() || !$isCurrentPlayer">
                 Knock
             </x-button>
         </div>
