@@ -53,6 +53,7 @@ class Lobby extends Component
         return [
             "echo:lobby,PlayerJoined" => 'reload',
             "echo:lobby,PlayerLeft" => 'reload',
+            "echo:lobby,GameStarted" => 'start',
         ];
     }
 
@@ -69,9 +70,14 @@ class Lobby extends Component
         $this->redirect('/lobby');
     }
 
-    public function start(): void
+    public function triggerStart(): void
     {
         GameStarted::dispatch();
+    }
+
+    public function start(): void
+    {
+        $this->redirect("/game?code=$this->code");
     }
 
     private function getCode(): ?string

@@ -23,7 +23,7 @@
     </x-button>
 
     @if($host && count($this->players) === 4)
-        <x-button wire:click="start">
+        <x-button wire:click="triggerStart">
             Start
         </x-button>
     @endif
