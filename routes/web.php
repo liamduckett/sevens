@@ -15,5 +15,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', Game::class);
+Route::get('/game', Game::class);
 Route::get('/start', Lobby::class);
