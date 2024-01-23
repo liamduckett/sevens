@@ -25,15 +25,19 @@
                 {{ $names[$currentPlayerId] }}
             </div>
 
+            @php
+                $isCurrentPlayer = $names[$currentPlayerId] === Session::get('playerId');
+            @endphp
+
             <x-button wire:click.throttle.500ms="knock"
-                      :disabled="$this->board->handIsPlayable($hand) || $this->hasWinner()">
+                      :disabled="$this->board->handIsPlayable($hand) || $this->hasWinner() || $isCurrentPlayer">
                 Knock
             </x-button>
         </div>
 
         <ul class="flex flex-wrap gap-3 rounded-xl justify-center">
             @foreach($hand->cards as $card)
-                <x-card :card="$card" :playable="$this->board->cardIsPlayable($card) && $this->hasNoWinner()"/>
+                <x-card :card="$card" :playable="$this->board->cardIsPlayable($card) && $this->hasNoWinner() && $isCurrentPlayer"/>
             @endforeach
         </ul>
     </div>
