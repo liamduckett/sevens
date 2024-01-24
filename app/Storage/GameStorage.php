@@ -3,14 +3,21 @@
 namespace App\Storage;
 
 use App\Events\PlayerJoined;
+use App\Events\PlayerLeft;
 use Illuminate\Support\Facades\Cache;
+use Livewire\Wireable;
 
-// TODO: replace Lobby $players with just the gamestorage
-class GameStorage
+class GameStorage implements Wireable
 {
-    public array $players;
+    public function __construct(
+        public string $code,
+        public array $players = [],
+    )
+    {
+        $this->players = Cache::get("games.$this->code.players") ?? [];
+    }
 
-    public function __construct(public string $code)
+    public function refresh(): void
     {
         $this->players = Cache::get("games.$this->code.players") ?? [];
     }
@@ -27,6 +34,15 @@ class GameStorage
     public function isHost(string $playerId): bool
     {
         return $this->players[0] === $playerId;
+    }
+
+    public function removePlayer(string $playerId): array
+    {
+        $this->players = array_diff($this->players, [$playerId]);
+        Cache::put("games.$this->code.players", $this->players);
+        PlayerLeft::dispatch();
+
+        return $this->players;
     }
 
     private function addPlayer(string $playerId): array
@@ -55,5 +71,21 @@ class GameStorage
     private function playerIsInGame(string $playerId): bool
     {
         return in_array($playerId, $this->players);
+    }
+
+    public function toLivewire(): array
+    {
+        return [
+            'code' => $this->code,
+            'players' => $this->players,
+        ];
+    }
+
+    public static function fromLivewire($value): self
+    {
+        return new self(
+            $value['code'],
+            $value['players'],
+        );
     }
 }
