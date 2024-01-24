@@ -7,7 +7,7 @@ use App\Events\PlayerLeft;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Wireable;
 
-class GameStorage implements Wireable
+class LobbyStorage implements Wireable
 {
     public function __construct(
         public string $code,

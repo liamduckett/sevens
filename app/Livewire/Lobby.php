@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Events\GameStarted;
-use App\Storage\GameStorage;
+use App\Storage\LobbyStorage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
@@ -20,7 +20,7 @@ class Lobby extends Component
     #[Locked]
     public string $code;
     #[Locked]
-    public GameStorage $gameStorage;
+    public LobbyStorage $gameStorage;
 
     public function mount(): void
     {
@@ -28,7 +28,7 @@ class Lobby extends Component
 
         $this->code = $this->getCode();
 
-        $this->gameStorage = new GameStorage(code: $this->code);
+        $this->gameStorage = new LobbyStorage(code: $this->code);
         $this->gameStorage->addPlayerIfApplicable($this->playerId);
 
         $this->host = $this->gameStorage->isHost($this->playerId);
