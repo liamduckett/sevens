@@ -7,7 +7,7 @@
 @endphp
 
 <div class="flex gap-10 justify-between">
-    <div class="flex gap-4 justify-center">
+    <div class="flex gap-4 justify-center flex-wrap">
         @foreach($board->contents as $suit => $boardSuit)
             <div class="flex flex-col justify-center w-52">
                 <div class="text-center text-2xl font-semibold pb-2 text-gray-700">
