@@ -34,39 +34,19 @@ class Game extends Component
 
     public function mount(): void
     {
-        // TODO: gracefully handle no code passed!
         $this->code = Request::get('code');
+
         $this->names = Cache::get("games.$this->code.players") ?? [];
 
-        // TODO: neaten
-        // if game has already been set up!
-        if($hands = Cache::get("hands.$this->code")) {
-            $this->hands = $hands;
-            $this->currentPlayerId = Cache::get("currentPlayerId.$this->code");
-            $this->board = Cache::get("board.$this->code");
-        } else {
-            $this->board = Board::make();
-            $this->hands = Deck::splitIntoHands(players: self::PLAYERS, names: $this->names);
-
-            // the first player is the one with the 7 diamonds
-            $startingHand = array_filter(
-                $this->hands,
-                fn(Hand $hand) => $hand->hasStartingCard(),
-            );
-
-            $this->currentPlayerId = array_key_first($startingHand);
-
-            Cache::put("hands.$this->code", $this->hands);
-            Cache::put("currentPlayerId.$this->code", $this->currentPlayerId);
-            Cache::put("board.$this->code", $this->board);
-        }
+        match($this->hasBeenSetup()) {
+            true => $this->fetchFromCache(),
+            false => $this->setUp(),
+        };
     }
 
     public function render(): View
     {
-        $this->hands = Cache::get("hands.$this->code");
-        $this->currentPlayerId = Cache::get("currentPlayerId.$this->code");
-        $this->board = Cache::get("board.$this->code");
+        $this->fetchFromCache();
 
         return view('livewire.game');
     }
@@ -126,11 +106,6 @@ class Game extends Component
 
     public function currentPlayerHand(): Hand
     {
-        return $this->hands[$this->currentPlayerId];
-    }
-
-    public function myHand(): Hand
-    {
         $hand = array_search(Session::get('playerId'), $this->names);
 
         return $this->hands[$hand];
@@ -146,6 +121,41 @@ class Game extends Component
         return ! $this->hasWinner();
     }
 
+    private function hasBeenSetup(): bool
+    {
+        return Cache::has("games.$this->code.board");
+    }
+
+    private function fetchFromCache(): void
+    {
+        $this->board = Cache::get("games.$this->code.board");
+        $this->hands = Cache::get("games.$this->code.hands");
+        $this->currentPlayerId = Cache::get("games.$this->code.currentPlayerId");
+    }
+
+    private function saveToCache(): void
+    {
+        Cache::put("games.$this->code.board", $this->board);
+        Cache::put("games.$this->code.hands", $this->hands);
+        Cache::put("games.$this->code.currentPlayerId", $this->currentPlayerId);
+    }
+
+    private function setUp(): void
+    {
+        $this->board = Board::make();
+        $this->hands = Deck::splitIntoHands(players: self::PLAYERS, names: $this->names);
+
+        // the first player is the one with the 7 diamonds
+        $startingHand = array_filter(
+            $this->hands,
+            fn(Hand $hand) => $hand->hasStartingCard(),
+        );
+
+        $this->currentPlayerId = array_key_first($startingHand);
+
+        $this->saveToCache();
+    }
+
     private function nextPlayer(): void {
         // array indexes are 0 through (PLAYERS - 1)
         // if next player would be too high, loop back to 1
@@ -153,11 +163,9 @@ class Game extends Component
             ? 0
             : $this->currentPlayerId + 1;
 
-        TurnTaken::dispatch();
+        $this->saveToCache();
 
-        Cache::put("hands.$this->code", $this->hands);
-        Cache::put("currentPlayerId.$this->code", $this->currentPlayerId);
-        Cache::put("board.$this->code", $this->board);
+        TurnTaken::dispatch();
     }
 
     private function checkForWinner(): void

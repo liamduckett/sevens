@@ -17,7 +17,7 @@
 
     <div class="p-8">
         @php
-            $hand = $this->myHand();
+            $hand = $this->currentPlayerHand();
             $isCurrentPlayer = $names[$currentPlayerId] === Session::get('playerId');
         @endphp
 
