@@ -14,8 +14,6 @@ use Livewire\Component;
 class Lobby extends Component
 {
     #[Locked]
-    public bool $host;
-    #[Locked]
     public string $playerId;
     #[Locked]
     public string $code;
@@ -29,9 +27,6 @@ class Lobby extends Component
         $this->code = $this->getCode();
 
         $this->lobbyStorage = new LobbyStorage(code: $this->code);
-        $this->lobbyStorage->addPlayerIfApplicable($this->playerId);
-
-        $this->host = $this->lobbyStorage->isHost($this->playerId);
     }
 
     public function render(): View
@@ -54,10 +49,14 @@ class Lobby extends Component
         $this->render();
     }
 
+    public function join(): void
+    {
+        $this->lobbyStorage->addPlayerIfApplicable($this->playerId);
+    }
+
     public function leave(): void
     {
         $this->lobbyStorage->removePlayer($this->playerId);
-        $this->redirect('/lobby');
     }
 
     // this is done via an event (rather than just the method) to trigger for everyone

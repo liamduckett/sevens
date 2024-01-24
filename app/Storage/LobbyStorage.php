@@ -22,35 +22,36 @@ class LobbyStorage implements Wireable
         $this->players = Cache::get("games.$this->code.players") ?? [];
     }
 
-    public function addPlayerIfApplicable(string $playerId): array
+    public function addPlayerIfApplicable(string $playerId): void
     {
         if($this->playerCanJoin($playerId)) {
-            $this->players = $this->addPlayer($playerId);
+            $this->addPlayer($playerId);
         }
-
-        return $this->players;
     }
 
     public function isHost(string $playerId): bool
     {
+        if(empty($this->players)) {
+            return false;
+        }
+
         return $this->players[0] === $playerId;
     }
 
-    public function removePlayer(string $playerId): array
+    public function removePlayer(string $playerId): void
     {
         $this->players = array_diff($this->players, [$playerId]);
+        $this->players = array_values($this->players);
+
         Cache::put("games.$this->code.players", $this->players);
         PlayerLeft::dispatch();
-
-        return $this->players;
     }
 
-    private function addPlayer(string $playerId): array
+    private function addPlayer(string $playerId): void
     {
         $this->players[] = $playerId;
         Cache::put("games.$this->code.players", $this->players);
         PlayerJoined::dispatch();
-        return $this->players;
     }
 
     private function playerCanJoin(string $playerId): bool
@@ -58,7 +59,12 @@ class LobbyStorage implements Wireable
         return $this->playerIsntInGame($playerId) && $this->isntFull();
     }
 
-    private function playerIsntInGame(string $playerId): bool
+    public function playerIsInGame(string $playerId): bool
+    {
+        return in_array($playerId, $this->players);
+    }
+
+    public function playerIsntInGame(string $playerId): bool
     {
         return ! $this->playerIsInGame($playerId);
     }
@@ -66,11 +72,6 @@ class LobbyStorage implements Wireable
     private function isntFull(): bool
     {
         return count($this->players) < 4;
-    }
-
-    private function playerIsInGame(string $playerId): bool
-    {
-        return in_array($playerId, $this->players);
     }
 
     public function toLivewire(): array
