@@ -2,7 +2,7 @@
     <div>(Id: {{ $playerId }})</div>
     <div>Code: {{ $code }}</div>
 
-    @foreach($gameStorage->players as $player)
+    @foreach($lobbyStorage->players as $player)
         <div>
             Id:
 
@@ -10,7 +10,7 @@
         </div>
     @endforeach
 
-    @for($missingPlayer = 1; $missingPlayer <= 4 - count($gameStorage->players); $missingPlayer++)
+    @for($missingPlayer = 1; $missingPlayer <= 4 - count($lobbyStorage->players); $missingPlayer++)
         <div>
             Id:
 
@@ -22,7 +22,7 @@
         Leave
     </x-button>
 
-    @if($host && count($gameStorage->players) === 4)
+    @if($host && count($lobbyStorage->players) === 4)
         <x-button wire:click="triggerStart">
             Start
         </x-button>

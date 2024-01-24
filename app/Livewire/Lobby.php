@@ -20,7 +20,7 @@ class Lobby extends Component
     #[Locked]
     public string $code;
     #[Locked]
-    public LobbyStorage $gameStorage;
+    public LobbyStorage $lobbyStorage;
 
     public function mount(): void
     {
@@ -28,15 +28,15 @@ class Lobby extends Component
 
         $this->code = $this->getCode();
 
-        $this->gameStorage = new LobbyStorage(code: $this->code);
-        $this->gameStorage->addPlayerIfApplicable($this->playerId);
+        $this->lobbyStorage = new LobbyStorage(code: $this->code);
+        $this->lobbyStorage->addPlayerIfApplicable($this->playerId);
 
-        $this->host = $this->gameStorage->isHost($this->playerId);
+        $this->host = $this->lobbyStorage->isHost($this->playerId);
     }
 
     public function render(): View
     {
-        $this->gameStorage->refresh();
+        $this->lobbyStorage->refresh();
         return view('livewire.lobby');
     }
 
@@ -56,7 +56,7 @@ class Lobby extends Component
 
     public function leave(): void
     {
-        $this->gameStorage->removePlayer($this->playerId);
+        $this->lobbyStorage->removePlayer($this->playerId);
         $this->redirect('/lobby');
     }
 
