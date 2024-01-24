@@ -131,9 +131,7 @@ class Game extends Component
 
     public function myHand(): Hand
     {
-        //dd(Session::get('playerId'));
         $hand = array_search(Session::get('playerId'), $this->names);
-        //dd($this->hands[$hand]);
 
         return $this->hands[$hand];
     }
