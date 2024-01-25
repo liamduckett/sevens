@@ -5,14 +5,17 @@ namespace App\Livewire;
 use App\Events\GameStarted;
 use App\Storage\LobbyStorage;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class Lobby extends Component
 {
+    // the input that gets turned into the playerId when valid
+    public ?string $name;
     #[Locked]
     public string $playerId;
     #[Locked]
@@ -22,8 +25,7 @@ class Lobby extends Component
 
     public function mount(): void
     {
-        $this->playerId = $this->getPlayerId();
-
+        $this->name = $this->getPlayerId();
         $this->code = $this->getCode();
 
         $this->lobbyStorage = new LobbyStorage(code: $this->code);
@@ -44,6 +46,16 @@ class Lobby extends Component
         ];
     }
 
+    public function rules(): array
+    {
+        $existingPlayerIds = Cache::get('playerIds') ?? [];
+        //dd($existingPlayerIds);
+
+        return [
+            'name' => ['required', 'string', 'between:2,4', Rule::notIn($existingPlayerIds)],
+        ];
+    }
+
     public function reload(): void
     {
         $this->render();
@@ -51,12 +63,37 @@ class Lobby extends Component
 
     public function join(): void
     {
-        $this->lobbyStorage->addPlayerIfApplicable($this->playerId);
+        $this->validate();
+        $this->updatePlayerId(); // pass name here...
+        $this->lobbyStorage->addPlayerIfApplicable($this->name);
+    }
+
+    // note this isnt a lifecycle hook, that would be 'updatedName'
+    private function updatePlayerId(): void
+    {
+        // keep track of every play name in use to prevent duplicates
+        $oldPlayerId = $this->getPlayerId();
+        $playerIds = Cache::get('playerIds') ?? [];
+        // remove player's old ID (if applicable)
+        $playerIds = array_diff($playerIds, [$oldPlayerId]);
+        // add player's new ID
+        $playerIds[] = $this->name;
+
+        Cache::put('playerIds', $playerIds);
+        $this->playerId = $this->name;
+        Session::put('playerId', $this->name);
     }
 
     public function leave(): void
     {
-        $this->lobbyStorage->removePlayer($this->playerId);
+        // keep track of every play name in use to prevent duplicates
+        $playerIds = Cache::get('playerIds') ?? [];
+        // remove player's ID
+        $playerIds = array_diff($playerIds, [$this->playerId]);
+
+        Cache::put('playerIds', $playerIds);
+
+        $this->lobbyStorage->removePlayer($this->name);
     }
 
     // this is done via an event (rather than just the method) to trigger for everyone
@@ -81,15 +118,8 @@ class Lobby extends Component
         return $code;
     }
 
-    private function getPlayerId(): string
+    private function getPlayerId(): ?string
     {
-        $playerId = Session::get('playerId');
-
-        if($playerId === null) {
-            $playerId = Str::random(length: 4);
-            Session::put('playerId', $playerId);
-        }
-
-        return $playerId;
+        return Session::get('playerId');
     }
 }
