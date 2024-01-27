@@ -136,6 +136,7 @@ class LobbyStorage implements Wireable
         return [
             'code' => $this->code,
             'players' => $this->players,
+            'size' => $this->size,
         ];
     }
 
@@ -144,6 +145,7 @@ class LobbyStorage implements Wireable
         return new self(
             $value['code'],
             $value['players'],
+            $value['size'],
         );
     }
 }
