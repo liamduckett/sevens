@@ -5,6 +5,7 @@ namespace App\Storage;
 use App\Events\PlayerJoined;
 use App\Events\PlayerLeft;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Livewire\Wireable;
 
@@ -60,6 +61,8 @@ class LobbyStorage implements Wireable
         Cache::put("games.$this->code.players", $this->players);
 
         PlayerLeft::dispatch();
+
+        Log::info("[$this->code] Left: $playerId");
     }
 
     private function addPlayer(string $playerId): void
@@ -79,6 +82,8 @@ class LobbyStorage implements Wireable
         Cache::put("games.$this->code.players", $this->players);
 
         PlayerJoined::dispatch();
+
+        Log::info("[$this->code] Joined: $playerId");
     }
 
     public static function freePlayerId(string $playerId): void

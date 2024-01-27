@@ -11,6 +11,7 @@ use App\Models\Hand;
 use App\Storage\LobbyStorage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Locked;
@@ -96,6 +97,8 @@ class Game extends Component
         $this->checkForWinner();
 
         $this->nextPlayer();
+
+        Log::info("[$this->code] " . Session::get('playerId') . " Played Card: $card");
     }
 
     public function knock(): void
@@ -115,6 +118,8 @@ class Game extends Component
         }
 
         $this->nextPlayer();
+
+        Log::info("[$this->code] " . Session::get('playerId') . " Knocked");
     }
 
     public function currentPlayerHand(): Hand
@@ -167,6 +172,8 @@ class Game extends Component
         $this->currentPlayerId = array_key_first($startingHand);
 
         $this->saveToCache();
+
+        Log::info("[$this->code] Set Up");
     }
 
     private function nextPlayer(): void {
@@ -201,6 +208,8 @@ class Game extends Component
             foreach($this->names as $playerId) {
                 LobbyStorage::freePlayerId($playerId);
             }
+
+            Log::info("[$this->code] " . Session::get('playerId') . " Won");
 
             GameWon::dispatch();
         }
