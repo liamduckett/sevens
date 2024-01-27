@@ -19,14 +19,18 @@
 
     @if($winner !== null)
         <div class="text-green-700 font-semibold text-3xl text-center">
-            {{ $names[$winner] }} has won!
+            {{ $names[$winner] === $name ? 'You have' : "$names[$winner] has" }} won!
         </div>
     @endif
 
     <div class="p-8">
         <div class="pb-4 flex justify-center items-center gap-10">
             <div class="text-lg font-bold text-gray-700">
-                {{ $isCurrentPlayer ? 'Your' : "$names[$currentPlayerId]'s" }} turn
+                @if($this->hasWinner())
+                    Game Over
+                @else
+                    {{ $isCurrentPlayer ? 'Your' : "$names[$currentPlayerId]'s" }} turn
+                @endif
             </div>
 
             <x-button wire:click.throttle.1s="knock"
