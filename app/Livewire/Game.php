@@ -44,6 +44,7 @@ class Game extends Component
         $this->code = Request::get('code');
         $this->players = Cache::get("games.$this->code.players") ?? [];
         $this->size = Cache::get("games.$this->code.size");
+        $this->winner = Cache::get("games.$this->code.winner");
 
         if(count($this->players) !== $this->size) {
             throw new \Exception('Not enough players');
@@ -64,7 +65,7 @@ class Game extends Component
     public function getListeners(): array
     {
         return [
-            'echo:lobby,TurnTaken' => 'reload',
+            'echo:lobby,TurnTaken' => 'render',
             'echo:lobby,GameWon' => 'getWinner',
         ];
     }
@@ -200,7 +201,7 @@ class Game extends Component
             // game has been won, inform everyone else!
             $winners = array_keys($winners);
             $this->winner = $winners[0];
-            Cache::put("game.$this->code.winner", $winners[0]);
+            Cache::put("games.$this->code.winner", $winners[0]);
 
             foreach($this->players as $playerId) {
                 LobbyStorage::freePlayerId($playerId);
@@ -214,7 +215,7 @@ class Game extends Component
 
     public function getWinner(): void
     {
-        $this->winner = Cache::get("game.$this->code.winner");
+        $this->winner = Cache::get("games.$this->code.winner");
     }
 
     private function isCurrentPlayer(): bool
