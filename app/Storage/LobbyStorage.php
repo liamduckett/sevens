@@ -16,9 +16,11 @@ class LobbyStorage implements Wireable
     public function __construct(
         public string $code,
         public array $players = [],
+        public int $size = 4,
     )
     {
         $this->players = Cache::get("games.$this->code.players") ?? [];
+        $this->size = Cache::get("games.$this->code.size");
     }
 
     public function refresh(): void
@@ -116,7 +118,7 @@ class LobbyStorage implements Wireable
 
     private function isFull(): bool
     {
-        return count($this->players) === self::PLAYERS;
+        return count($this->players) === $this->size;
     }
 
     public function isntFull(): bool
@@ -126,7 +128,7 @@ class LobbyStorage implements Wireable
 
     public function slotsOpen(): int
     {
-        return 4 - count($this->players);
+        return $this->size - count($this->players);
     }
 
     public function toLivewire(): array
