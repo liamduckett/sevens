@@ -75,13 +75,16 @@ class Game extends Component
             return;
         }
 
+        if($this->isntCurrentPlayer()) {
+            throw new \Exception("Not your turn");
+        }
+
         if($this->hasWinner()) {
             throw new \Exception("Game already won");
         }
 
         $card = Card::fromDto($card);
 
-        // TODO: a card should only be playable if it's in the hand of the current player
         if(! $this->board->cardIsPlayable($card)) {
             throw new \Exception("Unplayable card");
         }
@@ -96,6 +99,10 @@ class Game extends Component
 
     public function knock(): void
     {
+        if($this->isntCurrentPlayer()) {
+            throw new \Exception("Not your turn");
+        }
+
         if($this->hasWinner()) {
             throw new \Exception("Game already won");
         }
@@ -195,5 +202,15 @@ class Game extends Component
     public function getWinner(): void
     {
         $this->winner = Cache::get("game.$this->code.winner");
+    }
+
+    private function isCurrentPlayer(): bool
+    {
+        return $this->names[$this->currentPlayerId] === Session::get('playerId');
+    }
+
+    private function isntCurrentPlayer(): bool
+    {
+        return !$this->isCurrentPlayer();
     }
 }
