@@ -11,7 +11,7 @@ use Livewire\Wireable;
 
 class LobbyStorage implements Wireable
 {
-    public const PLAYERS = 4;
+    public const int PLAYERS = 4;
 
     public function __construct(
         public string $code,

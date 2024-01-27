@@ -19,7 +19,7 @@ use Livewire\Component;
 
 class Game extends Component
 {
-    public const PLAYERS = 4;
+    public const int PLAYERS = 4;
 
     #[Locked]
     /** @var array<Hand> $hands  */
