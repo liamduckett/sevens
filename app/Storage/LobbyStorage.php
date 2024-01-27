@@ -43,20 +43,15 @@ class LobbyStorage implements Wireable
 
     public function removePlayer(string $playerId): void
     {
-        // keep track of every play name in use to prevent duplicates
-        $playerIds = Cache::get('playerIds') ?? [];
-
         // REMOVE THEM FROM THE LOBBY
         $this->players = array_diff($this->players, [$playerId]);
         $this->players = array_values($this->players);
 
         // FREE UP THE NAME
-        $playerIds = array_diff($playerIds, [$playerId]);
-        $playerIds = array_values($playerIds);
+        self::freePlayerId($playerId);
 
         // PERSIST
         Session::forget('playerId');
-        Cache::put('playerIds', $playerIds);
         Cache::put("games.$this->code.players", $this->players);
 
         PlayerLeft::dispatch();
@@ -79,6 +74,19 @@ class LobbyStorage implements Wireable
         Cache::put("games.$this->code.players", $this->players);
 
         PlayerJoined::dispatch();
+    }
+
+    public static function freePlayerId(string $playerId): void
+    {
+        // keep track of every play name in use to prevent duplicates
+        $playerIds = Cache::get('playerIds') ?? [];
+
+        // FREE UP THE NAME
+        $playerIds = array_diff($playerIds, [$playerId]);
+        $playerIds = array_values($playerIds);
+
+        // PERSIST
+        Cache::put('playerIds', $playerIds);
     }
 
     private function playerCanJoin(string $playerId): bool

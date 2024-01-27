@@ -8,6 +8,7 @@ use App\Models\Board;
 use App\Models\Card;
 use App\Models\Deck;
 use App\Models\Hand;
+use App\Storage\LobbyStorage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
@@ -192,9 +193,15 @@ class Game extends Component
         }
 
         if(count($winners) === 1) {
+            // game has been won, inform everyone else!
             $winners = array_keys($winners);
             $this->winner = $winners[0];
             Cache::put("game.$this->code.winner", $winners[0]);
+
+            foreach($this->names as $playerId) {
+                LobbyStorage::freePlayerId($playerId);
+            }
+
             GameWon::dispatch();
         }
     }
