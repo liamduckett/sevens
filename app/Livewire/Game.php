@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Enums\Rank;
+use App\Enums\Suit;
 use App\Events\GameWon;
 use App\Events\TurnTaken;
 use App\Models\Board;
@@ -34,13 +36,16 @@ class Game extends Component
     public array $names = [];
     #[Locked]
     public string $code;
+    #[Locked]
+    public int $size;
 
     public function mount(): void
     {
         $this->code = Request::get('code');
         $this->names = Cache::get("games.$this->code.players") ?? [];
+        $this->size = Cache::get("games.$this->code.size");
 
-        if(count($this->names) !== self::PLAYERS) {
+        if(count($this->names) !== $this->size) {
             throw new \Exception('Not enough players');
         }
 
@@ -161,25 +166,18 @@ class Game extends Component
     private function setUp(): void
     {
         $this->board = Board::make();
-        $this->hands = Deck::splitIntoHands(players: self::PLAYERS, names: $this->names);
+        $this->hands = Deck::splitIntoHands(players: $this->size, names: $this->names);
 
-        // the first player is the one with the 7 diamonds
-        $startingHand = array_filter(
-            $this->hands,
-            fn(Hand $hand) => $hand->hasStartingCard(),
-        );
-
-        $this->currentPlayerId = array_key_first($startingHand);
-
+        $this->currentPlayerId = $this->determineFirstPlayer();
         $this->saveToCache();
 
         Log::info("[$this->code] Set Up");
     }
 
     private function nextPlayer(): void {
-        // array indexes are 0 through (PLAYERS - 1)
+        // array indexes are 0 through ($size - 1)
         // if next player would be too high, loop back to 1
-        $this->currentPlayerId = $this->currentPlayerId === self::PLAYERS - 1
+        $this->currentPlayerId = $this->currentPlayerId === $this->size - 1
             ? 0
             : $this->currentPlayerId + 1;
 
@@ -209,7 +207,7 @@ class Game extends Component
                 LobbyStorage::freePlayerId($playerId);
             }
 
-            Log::info("[$this->code] " . Session::get('playerId') . " Won");
+            Log::info("[$this->code] " . $winners[0] . " Won");
 
             GameWon::dispatch();
         }
@@ -228,5 +226,31 @@ class Game extends Component
     private function isntCurrentPlayer(): bool
     {
         return !$this->isCurrentPlayer();
+    }
+
+    private function determineFirstPlayer(): int
+    {
+        return match($this->size) {
+            4 => $this->playerWithStartingCard(),
+            3 => $this->randomPlayer(),
+        };
+    }
+
+    private function playerWithStartingCard(): int
+    {
+        $startingHand = array_filter(
+            $this->hands,
+            fn(Hand $hand) => $hand->hasStartingCard(),
+        );
+
+        return array_key_first($startingHand);
+    }
+
+    private function randomPlayer(): int
+    {
+        $startingCard = new Card(suit: Suit::DIAMONDS, rank: Rank::SEVEN);
+        $this->board->play($startingCard);
+
+        return array_rand($this->hands);
     }
 }
