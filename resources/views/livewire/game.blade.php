@@ -12,8 +12,8 @@
 
     @php
         $name = Session::get('playerId');
-        $hand = $this->currentPlayerHand();
-        $isCurrentPlayer = $this->isCurrentPlayer();
+        $hand = $this->currentTurnPlayerHand();
+        $isCurrentPlayer = $this->isCurrentTurnPlayer();
         $notCurrentPlayer = ! $isCurrentPlayer;
     @endphp
 

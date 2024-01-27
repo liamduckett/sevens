@@ -101,6 +101,13 @@ class LobbyStorage implements Wireable
         Cache::put('playerIds', $playerIds);
     }
 
+    public static function freePlayerIds(array $playerIds): void
+    {
+        foreach($playerIds as $playerId) {
+            self::freePlayerId($playerId);
+        }
+    }
+
     private function playerCanJoin(string $playerId): bool
     {
         return $this->playerIsntInGame($playerId) && $this->isntFull();

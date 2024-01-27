@@ -43,6 +43,11 @@ final class Board implements Wireable
         };
     }
 
+    public function cardIsntPlayable(Card $card): bool
+    {
+        return ! $this->cardIsPlayable($card);
+    }
+
     public function handIsPlayable(Hand $hand): bool
     {
         return array_reduce(

@@ -70,6 +70,11 @@ class Game extends Component
         ];
     }
 
+    public function getWinner(): void
+    {
+        $this->winner = Cache::get("games.$this->code.winner");
+    }
+
     public function playCard(array $card, bool $attempt): void
     {
         // a bit hacky - workaround to remove the need to conditionally add wire:click="playCard"
@@ -77,7 +82,7 @@ class Game extends Component
             return;
         }
 
-        if($this->isntCurrentPlayer()) {
+        if($this->isntCurrentTurnPlayer()) {
             throw new \Exception("Not your turn");
         }
 
@@ -87,23 +92,23 @@ class Game extends Component
 
         $card = Card::fromDto($card);
 
-        if(! $this->board->cardIsPlayable($card)) {
+        if($this->board->cardIsntPlayable($card)) {
             throw new \Exception("Unplayable card");
         }
 
         $this->board->play($card);
-        $this->currentPlayerHand()->removeCard($card);
+        $this->currentTurnPlayerHand()->removeCard($card);
 
         $this->checkForWinner();
 
         $this->nextPlayer();
 
-        Log::info("[$this->code] " . Session::get('playerId') . " Played Card: $card");
+        Log::info("[$this->code] {$this->playerId()} Played Card: $card");
     }
 
     public function knock(): void
     {
-        if($this->isntCurrentPlayer()) {
+        if($this->isntCurrentTurnPlayer()) {
             throw new \Exception("Not your turn");
         }
 
@@ -111,7 +116,7 @@ class Game extends Component
             throw new \Exception("Game already won");
         }
 
-        $hand = $this->currentPlayerHand();
+        $hand = $this->currentTurnPlayerHand();
 
         if($this->board->handIsPlayable($hand)) {
             throw new \Exception("Playable hand");
@@ -119,14 +124,7 @@ class Game extends Component
 
         $this->nextPlayer();
 
-        Log::info("[$this->code] " . Session::get('playerId') . " Knocked");
-    }
-
-    public function currentPlayerHand(): Hand
-    {
-        $key = array_search(Session::get('playerId'), $this->players);
-
-        return $this->hands[$key];
+        Log::info("[$this->code] {$this->playerId()} Knocked");
     }
 
     public function hasWinner(): bool
@@ -163,7 +161,7 @@ class Game extends Component
         $this->board = Board::make();
         $this->hands = Deck::splitIntoHands(players: $this->size, names: $this->players);
 
-        $this->currentTurnPlayerId = $this->determineFirstPlayer();
+        $this->currentTurnPlayerId = $this->determineFirstTurnPlayer();
         $this->saveToCache();
 
         Log::info("[$this->code] Set Up");
@@ -193,37 +191,35 @@ class Game extends Component
         }
 
         if(count($winners) === 1) {
-            // game has been won, inform everyone else!
-            $winners = array_keys($winners);
-            $this->winner = $winners[0];
-            Cache::put("games.$this->code.winner", $winners[0]);
+            // game has been won
+            $this->winner = array_key_first($winners);
+            Cache::put("games.$this->code.winner", $this->winner);
+            LobbyStorage::freePlayerIds($this->players);
 
-            foreach($this->players as $playerId) {
-                LobbyStorage::freePlayerId($playerId);
-            }
-
-            Log::info("[$this->code] " . $winners[0] . " Won");
+            Log::info("[$this->code] " . $this->winner . " Won");
 
             GameWon::dispatch();
         }
     }
 
-    public function getWinner(): void
+    private function isCurrentTurnPlayer(): bool
     {
-        $this->winner = Cache::get("games.$this->code.winner");
+        return $this->players[$this->currentTurnPlayerId] === $this->playerId();
     }
 
-    private function isCurrentPlayer(): bool
+    private function isntCurrentTurnPlayer(): bool
     {
-        return $this->players[$this->currentTurnPlayerId] === Session::get('playerId');
+        return !$this->isCurrentTurnPlayer();
     }
 
-    private function isntCurrentPlayer(): bool
+    public function currentTurnPlayerHand(): Hand
     {
-        return !$this->isCurrentPlayer();
+        $key = array_search($this->playerId(), $this->players);
+
+        return $this->hands[$key];
     }
 
-    private function determineFirstPlayer(): int
+    private function determineFirstTurnPlayer(): int
     {
         return match($this->size) {
             4 => $this->playerWithStartingCard(),
@@ -247,5 +243,10 @@ class Game extends Component
         $this->board->play($startingCard);
 
         return array_rand($this->hands);
+    }
+
+    private function playerId(): string
+    {
+        return Session::get('playerId');
     }
 }
