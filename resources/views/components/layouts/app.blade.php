@@ -12,20 +12,13 @@
         {{ $slot }}
 
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', () => {
                 window.Echo.channel('lobby')
-                    .listen('PlayerJoined', () => {
-                        // console.log('PlayerJoined');
-                    })
-                    .listen('PlayerLeft', () => {
-                        // console.log('PlayerLeft');
-                    })
-                    .listen('GameStarted', () => {
-                        // console.log('GameStarted');
-                    })
-                    .listen('TurnTaken', () => {
-                        // console.log('TurnTaken');
-                    })
+                    .listen('PlayerJoined', () => {})
+                    .listen('PlayerLeft', () => {})
+                    .listen('GameStarted', () => {})
+                    .listen('TurnTaken', () => {})
+                    .listen('GameWon', () => {})
                 ;
             });
         </script>

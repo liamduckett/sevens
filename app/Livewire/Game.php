@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Events\GameWon;
 use App\Events\TurnTaken;
 use App\Models\Board;
 use App\Models\Card;
@@ -35,7 +36,6 @@ class Game extends Component
     public function mount(): void
     {
         $this->code = Request::get('code');
-
         $this->names = Cache::get("games.$this->code.players") ?? [];
 
         match($this->hasBeenSetup()) {
@@ -47,14 +47,15 @@ class Game extends Component
     public function render(): View
     {
         $this->fetchFromCache();
-
+        $this->checkForWinner();
         return view('livewire.game');
     }
 
     public function getListeners(): array
     {
         return [
-            "echo:lobby,TurnTaken" => 'reload',
+            'echo:lobby,TurnTaken' => 'reload',
+            'echo:lobby,GameWon' => 'getWinner',
         ];
     }
 
@@ -182,6 +183,13 @@ class Game extends Component
         if(count($winners) === 1) {
             $winners = array_keys($winners);
             $this->winner = $winners[0];
+            Cache::put("game.$this->code.winner", $winners[0]);
+            GameWon::dispatch();
         }
+    }
+
+    public function getWinner(): void
+    {
+        $this->winner = Cache::get("game.$this->code.winner");
     }
 }
