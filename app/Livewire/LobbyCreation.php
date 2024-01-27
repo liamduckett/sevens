@@ -30,6 +30,6 @@ class LobbyCreation extends Component
     public function createLobby(): void
     {
         Cache::put("games.$this->code.size", $this->playerCount);
-        $this->redirect("/start?code=$this->code");
+        $this->redirect("/lobby?code=$this->code");
     }
 }
