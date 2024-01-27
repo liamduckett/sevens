@@ -19,6 +19,16 @@
                 WAITING
             </div>
         @endfor
+
+        @if($lobbyStorage->isntFull())
+            <div class="font-semibold text-green-700 text-sm mt-2">
+                Waiting for {{ $lobbyStorage->slotsOpen() }} players...
+            </div>
+        @else
+            <div class="font-semibold text-green-700 text-sm mt-2">
+                Waiting for {{ $lobbyStorage->isHost($playerId) ? 'you' : $lobbyStorage->host() }} to start...
+            </div>
+        @endif
     </div>
 
     @if(!$playerId || $lobbyStorage->playerIsntInGame($playerId))

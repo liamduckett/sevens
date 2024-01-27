@@ -32,13 +32,18 @@ class LobbyStorage implements Wireable
         }
     }
 
+    public function host(): string
+    {
+        return $this->players[0];
+    }
+
     public function isHost(string $playerId): bool
     {
         if(empty($this->players)) {
             return false;
         }
 
-        return $this->players[0] === $playerId;
+        return $this->host() === $playerId;
     }
 
     public function removePlayer(string $playerId): void
