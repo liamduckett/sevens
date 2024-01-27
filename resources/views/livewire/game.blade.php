@@ -26,9 +26,7 @@
     <div class="p-8">
         <div class="pb-4 flex justify-center items-center gap-10">
             <div class="text-lg font-bold text-gray-700">
-                {{ $name }}
-
-                it is {{ $names[$currentPlayerId] }}'s turn
+                {{ $isCurrentPlayer ? 'Your' : "$names[$currentPlayerId]'s" }} turn
             </div>
 
             <x-button wire:click.throttle.1s="knock"
