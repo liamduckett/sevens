@@ -70,11 +70,6 @@ class Game extends Component
         ];
     }
 
-    public function reload(): void
-    {
-        $this->render();
-    }
-
     public function playCard(array $card, bool $attempt): void
     {
         // a bit hacky - workaround to remove the need to conditionally add wire:click="playCard"

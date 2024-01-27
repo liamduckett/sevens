@@ -37,8 +37,8 @@ class Lobby extends Component
     public function getListeners(): array
     {
         return [
-            "echo:lobby,PlayerJoined" => 'reload',
-            "echo:lobby,PlayerLeft" => 'reload',
+            "echo:lobby,PlayerJoined" => 'render',
+            "echo:lobby,PlayerLeft" => 'render',
             "echo:lobby,GameStarted" => 'start',
         ];
     }
@@ -50,11 +50,6 @@ class Lobby extends Component
         return [
             'name' => ['required', 'string', 'between:2,4', Rule::notIn($existingPlayerIds)],
         ];
-    }
-
-    public function reload(): void
-    {
-        $this->render();
     }
 
     public function join(): void
