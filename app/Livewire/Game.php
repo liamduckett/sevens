@@ -27,7 +27,7 @@ class Game extends Component
     /** @var array<Hand> $hands  */
     public array $hands;
     #[Locked]
-    public int $currentPlayerId;
+    public int $currentTurnPlayerId;
     #[Locked]
     public Board $board;
     #[Locked]
@@ -153,14 +153,14 @@ class Game extends Component
     {
         $this->board = Cache::get("games.$this->code.board");
         $this->hands = Cache::get("games.$this->code.hands");
-        $this->currentPlayerId = Cache::get("games.$this->code.currentPlayerId");
+        $this->currentTurnPlayerId = Cache::get("games.$this->code.currentTurnPlayerId");
     }
 
     private function saveToCache(): void
     {
         Cache::put("games.$this->code.board", $this->board);
         Cache::put("games.$this->code.hands", $this->hands);
-        Cache::put("games.$this->code.currentPlayerId", $this->currentPlayerId);
+        Cache::put("games.$this->code.currentTurnPlayerId", $this->currentTurnPlayerId);
     }
 
     private function setUp(): void
@@ -168,7 +168,7 @@ class Game extends Component
         $this->board = Board::make();
         $this->hands = Deck::splitIntoHands(players: $this->size, names: $this->names);
 
-        $this->currentPlayerId = $this->determineFirstPlayer();
+        $this->currentTurnPlayerId = $this->determineFirstPlayer();
         $this->saveToCache();
 
         Log::info("[$this->code] Set Up");
@@ -177,9 +177,9 @@ class Game extends Component
     private function nextPlayer(): void {
         // array indexes are 0 through ($size - 1)
         // if next player would be too high, loop back to 1
-        $this->currentPlayerId = $this->currentPlayerId === $this->size - 1
+        $this->currentTurnPlayerId = $this->currentTurnPlayerId === $this->size - 1
             ? 0
-            : $this->currentPlayerId + 1;
+            : $this->currentTurnPlayerId + 1;
 
         $this->saveToCache();
 
@@ -220,7 +220,7 @@ class Game extends Component
 
     private function isCurrentPlayer(): bool
     {
-        return $this->names[$this->currentPlayerId] === Session::get('playerId');
+        return $this->names[$this->currentTurnPlayerId] === Session::get('playerId');
     }
 
     private function isntCurrentPlayer(): bool
