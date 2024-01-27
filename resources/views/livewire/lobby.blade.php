@@ -1,4 +1,8 @@
 <div class="max-w-lg mx-auto">
+    @php
+        $playerId = $this->getPlayerId();
+    @endphp
+
     <div class="my-4">
         @foreach($lobbyStorage->players as $player)
             <div>

@@ -17,15 +17,12 @@ class Lobby extends Component
     // the input that gets turned into the playerId when valid
     public ?string $name;
     #[Locked]
-    public string $playerId;
-    #[Locked]
     public string $code;
     #[Locked]
     public LobbyStorage $lobbyStorage;
 
     public function mount(): void
     {
-        $this->name = $this->getPlayerId();
         $this->code = $this->getCode();
 
         $this->lobbyStorage = new LobbyStorage(code: $this->code);
@@ -49,7 +46,6 @@ class Lobby extends Component
     public function rules(): array
     {
         $existingPlayerIds = Cache::get('playerIds') ?? [];
-        //dd($existingPlayerIds);
 
         return [
             'name' => ['required', 'string', 'between:2,4', Rule::notIn($existingPlayerIds)],
@@ -64,36 +60,13 @@ class Lobby extends Component
     public function join(): void
     {
         $this->validate();
-        $this->updatePlayerId(); // pass name here...
         $this->lobbyStorage->addPlayerIfApplicable($this->name);
-    }
-
-    // note this isnt a lifecycle hook, that would be 'updatedName'
-    private function updatePlayerId(): void
-    {
-        // keep track of every play name in use to prevent duplicates
-        $oldPlayerId = $this->getPlayerId();
-        $playerIds = Cache::get('playerIds') ?? [];
-        // remove player's old ID (if applicable)
-        $playerIds = array_diff($playerIds, [$oldPlayerId]);
-        // add player's new ID
-        $playerIds[] = $this->name;
-
-        Cache::put('playerIds', $playerIds);
-        $this->playerId = $this->name;
-        Session::put('playerId', $this->name);
     }
 
     public function leave(): void
     {
-        // keep track of every play name in use to prevent duplicates
-        $playerIds = Cache::get('playerIds') ?? [];
-        // remove player's ID
-        $playerIds = array_diff($playerIds, [$this->playerId]);
-
-        Cache::put('playerIds', $playerIds);
-
-        $this->lobbyStorage->removePlayer($this->name);
+        $playerId = $this->getPlayerId();
+        $this->lobbyStorage->removePlayer($playerId);
     }
 
     // this is done via an event (rather than just the method) to trigger for everyone
