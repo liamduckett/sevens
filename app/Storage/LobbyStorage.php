@@ -11,13 +11,10 @@ use Livewire\Wireable;
 
 class LobbyStorage implements Wireable
 {
-    public const int PLAYERS = 4;
+    public array $players;
+    public int $size;
 
-    public function __construct(
-        public string $code,
-        public array $players = [],
-        public int $size = 4,
-    )
+    public function __construct(public string $code)
     {
         $this->players = Cache::get("games.$this->code.players") ?? [];
         $this->size = Cache::get("games.$this->code.size");
@@ -67,6 +64,33 @@ class LobbyStorage implements Wireable
         Log::info("[$this->code] Left: $playerId");
     }
 
+    public static function freePlayerIds(array $playerIds): void
+    {
+        foreach($playerIds as $playerId) {
+            self::freePlayerId($playerId);
+        }
+    }
+
+    public function playerIsInGame(string $playerId): bool
+    {
+        return in_array($playerId, $this->players);
+    }
+
+    public function playerIsntInGame(string $playerId): bool
+    {
+        return ! $this->playerIsInGame($playerId);
+    }
+
+    public function isntFull(): bool
+    {
+        return !$this->isFull();
+    }
+
+    public function openSlots(): int
+    {
+        return $this->size - count($this->players);
+    }
+
     private function addPlayer(string $playerId): void
     {
         // keep track of every play name in use to prevent duplicates
@@ -88,7 +112,7 @@ class LobbyStorage implements Wireable
         Log::info("[$this->code] Joined: $playerId");
     }
 
-    public static function freePlayerId(string $playerId): void
+    private static function freePlayerId(string $playerId): void
     {
         // keep track of every play name in use to prevent duplicates
         $playerIds = Cache::get('playerIds') ?? [];
@@ -101,26 +125,9 @@ class LobbyStorage implements Wireable
         Cache::put('playerIds', $playerIds);
     }
 
-    public static function freePlayerIds(array $playerIds): void
-    {
-        foreach($playerIds as $playerId) {
-            self::freePlayerId($playerId);
-        }
-    }
-
     private function playerCanJoin(string $playerId): bool
     {
         return $this->playerIsntInGame($playerId) && $this->isntFull();
-    }
-
-    public function playerIsInGame(string $playerId): bool
-    {
-        return in_array($playerId, $this->players);
-    }
-
-    public function playerIsntInGame(string $playerId): bool
-    {
-        return ! $this->playerIsInGame($playerId);
     }
 
     private function isFull(): bool
@@ -128,31 +135,13 @@ class LobbyStorage implements Wireable
         return count($this->players) === $this->size;
     }
 
-    public function isntFull(): bool
-    {
-        return !$this->isFull();
-    }
-
-    public function slotsOpen(): int
-    {
-        return $this->size - count($this->players);
-    }
-
     public function toLivewire(): array
     {
-        return [
-            'code' => $this->code,
-            'players' => $this->players,
-            'size' => $this->size,
-        ];
+        return ['code' => $this->code];
     }
 
     public static function fromLivewire($value): self
     {
-        return new self(
-            $value['code'],
-            $value['players'],
-            $value['size'],
-        );
+        return new self($value['code']);
     }
 }

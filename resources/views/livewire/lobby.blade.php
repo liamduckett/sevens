@@ -12,7 +12,7 @@
             </div>
         @endforeach
 
-        @for($openSlot = 1; $openSlot <= $lobbyStorage->slotsOpen(); $openSlot++)
+        @for($openSlot = 1; $openSlot <= $lobbyStorage->openSlots(); $openSlot++)
             <div>
                 Name:
 
@@ -22,7 +22,7 @@
 
         @if($lobbyStorage->isntFull())
             <div class="font-semibold text-green-700 text-sm mt-2">
-                Waiting for {{ $lobbyStorage->slotsOpen() }} players...
+                Waiting for {{ $lobbyStorage->openSlots() }} players...
             </div>
         @else
             <div class="font-semibold text-green-700 text-sm mt-2">
