@@ -33,7 +33,7 @@ class Game extends Component
     #[Locked]
     public ?int $winner = null;
     #[Locked]
-    public array $names = [];
+    public array $players = [];
     #[Locked]
     public string $code;
     #[Locked]
@@ -42,10 +42,10 @@ class Game extends Component
     public function mount(): void
     {
         $this->code = Request::get('code');
-        $this->names = Cache::get("games.$this->code.players") ?? [];
+        $this->players = Cache::get("games.$this->code.players") ?? [];
         $this->size = Cache::get("games.$this->code.size");
 
-        if(count($this->names) !== $this->size) {
+        if(count($this->players) !== $this->size) {
             throw new \Exception('Not enough players');
         }
 
@@ -129,9 +129,9 @@ class Game extends Component
 
     public function currentPlayerHand(): Hand
     {
-        $hand = array_search(Session::get('playerId'), $this->names);
+        $key = array_search(Session::get('playerId'), $this->players);
 
-        return $this->hands[$hand];
+        return $this->hands[$key];
     }
 
     public function hasWinner(): bool
@@ -166,7 +166,7 @@ class Game extends Component
     private function setUp(): void
     {
         $this->board = Board::make();
-        $this->hands = Deck::splitIntoHands(players: $this->size, names: $this->names);
+        $this->hands = Deck::splitIntoHands(players: $this->size, names: $this->players);
 
         $this->currentTurnPlayerId = $this->determineFirstPlayer();
         $this->saveToCache();
@@ -203,7 +203,7 @@ class Game extends Component
             $this->winner = $winners[0];
             Cache::put("game.$this->code.winner", $winners[0]);
 
-            foreach($this->names as $playerId) {
+            foreach($this->players as $playerId) {
                 LobbyStorage::freePlayerId($playerId);
             }
 
@@ -220,7 +220,7 @@ class Game extends Component
 
     private function isCurrentPlayer(): bool
     {
-        return $this->names[$this->currentTurnPlayerId] === Session::get('playerId');
+        return $this->players[$this->currentTurnPlayerId] === Session::get('playerId');
     }
 
     private function isntCurrentPlayer(): bool

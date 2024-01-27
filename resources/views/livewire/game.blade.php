@@ -3,12 +3,12 @@
     /** @var int $currentTurnUserId  */
     /** @var \App\Models\Board $board  */
     /** @var ?int $winner */
-    /** @var array $names */
+    /** @var array $players */
     /** @var string $code */
 @endphp
 
 <div class="max-w-5xl mx-auto flex flex-col gap-10 py-10">
-    <x-board :board="$board" :hands="$hands" :names="$names"/>
+    <x-board :board="$board" :hands="$hands" :names="$players"/>
 
     @php
         $name = Session::get('playerId');
@@ -19,7 +19,7 @@
 
     @if($winner !== null)
         <div class="text-green-700 font-semibold text-3xl text-center">
-            {{ $names[$winner] === $name ? 'You have' : "$names[$winner] has" }} won!
+            {{ $players[$winner] === $name ? 'You have' : "$players[$winner] has" }} won!
         </div>
     @endif
 
@@ -29,7 +29,7 @@
                 @if($this->hasWinner())
                     Game Over
                 @else
-                    {{ $isCurrentPlayer ? 'Your' : "$names[$currentTurnUserId]'s" }} turn
+                    {{ $isCurrentPlayer ? 'Your' : "$players[$currentTurnUserId]'s" }} turn
                 @endif
             </div>
 
