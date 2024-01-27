@@ -17,7 +17,7 @@
         $notCurrentPlayer = ! $isCurrentPlayer;
     @endphp
 
-    @if($winner)
+    @if($winner !== null)
         <div class="text-green-700 font-semibold text-3xl text-center">
             {{ $names[$winner] }} has won!
         </div>
