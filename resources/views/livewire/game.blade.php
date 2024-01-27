@@ -1,6 +1,6 @@
 @php
     /** @var array<\App\Models\Hand> $hands  */
-    /** @var int $currentTurnUserId  */
+    /** @var int $currentTurnPlayerId  */
     /** @var \App\Models\Board $board  */
     /** @var ?int $winner */
     /** @var array $players */
@@ -29,7 +29,7 @@
                 @if($this->hasWinner())
                     Game Over
                 @else
-                    {{ $isCurrentPlayer ? 'Your' : "$players[$currentTurnUserId]'s" }} turn
+                    {{ $isCurrentPlayer ? 'Your' : "$players[$currentTurnPlayerId]'s" }} turn
                 @endif
             </div>
 

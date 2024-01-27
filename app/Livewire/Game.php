@@ -33,7 +33,7 @@ class Game extends Component
     #[Locked]
     public ?int $winner = null;
     #[Locked]
-    public array $players = [];
+    public array $players;
     #[Locked]
     public string $code;
     #[Locked]
@@ -58,7 +58,6 @@ class Game extends Component
     public function render(): View
     {
         $this->fetchFromCache();
-        $this->checkForWinner();
         return view('livewire.game');
     }
 
