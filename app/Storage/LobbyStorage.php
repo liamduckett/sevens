@@ -10,6 +10,8 @@ use Livewire\Wireable;
 
 class LobbyStorage implements Wireable
 {
+    public const PLAYERS = 4;
+
     public function __construct(
         public string $code,
         public array $players = [],
@@ -94,9 +96,19 @@ class LobbyStorage implements Wireable
         return ! $this->playerIsInGame($playerId);
     }
 
-    private function isntFull(): bool
+    private function isFull(): bool
     {
-        return count($this->players) < 4;
+        return count($this->players) === self::PLAYERS;
+    }
+
+    public function isntFull(): bool
+    {
+        return !$this->isFull();
+    }
+
+    public function slotsOpen(): int
+    {
+        return 4 - count($this->players);
     }
 
     public function toLivewire(): array

@@ -12,7 +12,7 @@
             </div>
         @endforeach
 
-        @for($missingPlayer = 1; $missingPlayer <= 4 - count($lobbyStorage->players); $missingPlayer++)
+        @for($openSlot = 1; $openSlot <= $lobbyStorage->slotsOpen(); $openSlot++)
             <div>
                 Name:
 
@@ -35,15 +35,17 @@
         </x-button>
     @endif
 
-    @if($playerId && $lobbyStorage->playerIsInGame($playerId))
-        <x-button wire:click="leave">
-            Leave
-        </x-button>
-    @endif
+    @if($playerId)
+        @if($lobbyStorage->playerIsInGame($playerId))
+            <x-button wire:click="leave">
+                Leave
+            </x-button>
+        @endif
 
-    @if($playerId && $lobbyStorage->isHost($playerId) && count($lobbyStorage->players) === 4)
-        <x-button wire:click="triggerStart">
-            Start
-        </x-button>
+        @if($lobbyStorage->isHost($playerId))
+            <x-button wire:click="triggerStart" :disabled="$lobbyStorage->isntFull()">
+                Start
+            </x-button>
+        @endif
     @endif
 </div>
