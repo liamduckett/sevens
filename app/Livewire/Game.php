@@ -38,6 +38,10 @@ class Game extends Component
         $this->code = Request::get('code');
         $this->names = Cache::get("games.$this->code.players") ?? [];
 
+        if(count($this->names) !== self::PLAYERS) {
+            throw new \Exception('Not enough players');
+        }
+
         match($this->hasBeenSetup()) {
             true => $this->fetchFromCache(),
             false => $this->setUp(),
