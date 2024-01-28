@@ -1,5 +1,5 @@
 @php
-    /** @var array<\App\Models\Hand> $hands  */
+    /** @var \App\Models\Hand $hand  */
     /** @var int $currentTurnPlayerId  */
     /** @var \App\Models\Board $board  */
     /** @var ?int $winner */
@@ -8,11 +8,10 @@
 @endphp
 
 <div class="max-w-5xl mx-auto flex flex-col gap-10 py-10">
-    <x-board :board="$board" :hands="$hands" :names="$players"/>
+    <x-board :board="$board" :hand="$hand" :names="$players"/>
 
     @php
         $name = Session::get('playerId');
-        $hand = $this->currentTurnPlayerHand();
         $isCurrentPlayer = $this->isCurrentTurnPlayer();
         $notCurrentPlayer = ! $isCurrentPlayer;
     @endphp

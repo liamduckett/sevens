@@ -24,8 +24,7 @@ class Game extends Component
     public const int PLAYERS = 4;
 
     #[Locked]
-    /** @var array<Hand> $hands  */
-    public array $hands;
+    public Hand $hand;
     #[Locked]
     public int $currentTurnPlayerId;
     #[Locked]
@@ -144,25 +143,34 @@ class Game extends Component
 
     private function fetchFromCache(): void
     {
+        $hands = Cache::get("games.$this->code.hands");
+
         $this->board = Cache::get("games.$this->code.board");
-        $this->hands = Cache::get("games.$this->code.hands");
+        $this->hand = $hands[$this->playerKey()];
         $this->currentTurnPlayerId = Cache::get("games.$this->code.currentTurnPlayerId");
     }
 
     private function saveToCache(): void
     {
+        // update hands...
+        $hands = Cache::get("games.$this->code.hands");
+        $hands[$this->playerKey()] = $this->hand;
+
         Cache::put("games.$this->code.board", $this->board);
-        Cache::put("games.$this->code.hands", $this->hands);
+        Cache::put("games.$this->code.hands", $hands);
         Cache::put("games.$this->code.currentTurnPlayerId", $this->currentTurnPlayerId);
     }
 
     private function setUp(): void
     {
         $this->board = Board::make();
-        $this->hands = Deck::splitIntoHands(players: $this->size, names: $this->players);
+        $hands = Deck::splitIntoHands(players: $this->size, names: $this->players);
 
-        $this->currentTurnPlayerId = $this->determineFirstTurnPlayer();
-        $this->saveToCache();
+        $this->currentTurnPlayerId = $this->determineFirstTurnPlayer($hands);
+
+        Cache::put("games.$this->code.board", $this->board);
+        Cache::put("games.$this->code.hands", $hands);
+        Cache::put("games.$this->code.currentTurnPlayerId", $this->currentTurnPlayerId);
 
         Log::info("[$this->code] Set Up");
     }
@@ -181,18 +189,8 @@ class Game extends Component
 
     private function checkForWinner(): void
     {
-        $winners = array_filter(
-            $this->hands,
-            fn(Hand $hand) => $hand->isEmpty(),
-        );
-
-        if(count($winners) > 1) {
-            throw new \Exception("More than one winner");
-        }
-
-        if(count($winners) === 1) {
-            // game has been won
-            $this->winner = array_key_first($winners);
+        if($this->hand->isEmpty()) {
+            $this->winner = $this->playerKey();
             Cache::put("games.$this->code.winner", $this->winner);
             LobbyStorage::freePlayerIds($this->players);
 
@@ -214,39 +212,42 @@ class Game extends Component
 
     public function currentTurnPlayerHand(): Hand
     {
-        $key = array_search($this->playerId(), $this->players);
-
-        return $this->hands[$key];
+        return $this->hand;
     }
 
-    private function determineFirstTurnPlayer(): int
+    private function determineFirstTurnPlayer(array $hands): int
     {
         return match($this->size) {
-            4 => $this->playerWithStartingCard(),
-            3 => $this->randomPlayer(),
+            4 => $this->playerWithStartingCard($hands),
+            3 => $this->randomPlayer($hands),
         };
     }
 
-    private function playerWithStartingCard(): int
+    private function playerWithStartingCard(array $hands): int
     {
         $startingHand = array_filter(
-            $this->hands,
+            $hands,
             fn(Hand $hand) => $hand->hasStartingCard(),
         );
 
         return array_key_first($startingHand);
     }
 
-    private function randomPlayer(): int
+    private function randomPlayer(array $hands): int
     {
         $startingCard = new Card(suit: Suit::DIAMONDS, rank: Rank::SEVEN);
         $this->board->play($startingCard);
 
-        return array_rand($this->hands);
+        return array_rand($hands);
     }
 
     private function playerId(): string
     {
         return Session::get('playerId');
+    }
+
+    public function playerKey(): string
+    {
+        return array_search($this->playerId(), $this->players);
     }
 }

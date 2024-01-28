@@ -1,8 +1,8 @@
-@props(['board', 'hands', 'names'])
+@props(['board', 'hand', 'names'])
 
 @php
     /** @var \App\Models\Board $board */
-    /** @var array<\App\Models\Hand> $hands */
+    /** @var \App\Models\Hand $hand */
     /** @var array $names */
 @endphp
 
@@ -37,17 +37,17 @@
         @endforeach
     </div>
 
-    <div class="self-end pb-4">
-        @foreach($hands as $id => $hand)
-            <div class="text-sm text-gray-700 font-semibold flex justify-between gap-4">
-                <div>
-                    {{ $names[$id] }}:
-                </div>
+    {{--<div class="self-end pb-4">--}}
+    {{--    @foreach($hands as $id => $hand)--}}
+    {{--        <div class="text-sm text-gray-700 font-semibold flex justify-between gap-4">--}}
+    {{--            <div>--}}
+    {{--                {{ $names[$id] }}:--}}
+    {{--            </div>--}}
 
-                <div>
-                    {{ $hand->count() }}
-                </div>
-            </div>
-        @endforeach
-    </div>
+    {{--            <div>--}}
+    {{--                {{ $hand->count() }}--}}
+    {{--            </div>--}}
+    {{--        </div>--}}
+    {{--    @endforeach--}}
+    {{--</div>--}}
 </div>
