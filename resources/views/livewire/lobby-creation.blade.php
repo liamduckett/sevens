@@ -1,7 +1,7 @@
 <div class="max-w-lg mx-auto flex flex-col gap-4 mt-10">
-    <div class="flex gap-2">
+    <div class="flex items-center gap-2">
         Code:
-        <input type="text" wire:model="code"/>
+        <x-input type="text" wire:model="code"/>
     </div>
 
     <div class="flex flex-col gap-2">

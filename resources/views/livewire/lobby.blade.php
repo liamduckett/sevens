@@ -33,7 +33,7 @@
 
     @if(!$playerId || $lobbyStorage->playerIsntInGame($playerId))
         <div class="pb-2">
-            <input wire:model.live="name" placeholder="Liam..."/>
+            <x-input wire:model.live="name" placeholder="Liam..."/>
 
             @error('name')
                 <div class="text-sm text-red-500">{{ $message }}</div>

@@ -194,7 +194,7 @@ class Game extends Component
             Cache::put("games.$this->code.winner", $this->winner);
             LobbyStorage::freePlayerIds($this->players);
 
-            Log::info("[$this->code] " . $this->winner . " Won");
+            Log::info("[$this->code] $this->winner Won");
 
             GameWon::dispatch();
         }
