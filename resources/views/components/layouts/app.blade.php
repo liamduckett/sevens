@@ -6,7 +6,7 @@
         @vite('resources/css/app.css')
         @vite('resources/js/app.js')
 
-        <title>{{ $title ?? 'Page Title' }}</title>
+        <title>Sevens | Liam Duckett</title>
     </head>
     <body>
         {{ $slot }}
