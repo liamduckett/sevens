@@ -21,10 +21,10 @@ use Livewire\Component;
 
 class Game extends Component
 {
-    public const int PLAYERS = 4;
-
     #[Locked]
     public Hand $hand;
+    #[Locked]
+    public array $handCounts;
     #[Locked]
     public int $currentTurnPlayerId;
     #[Locked]
@@ -98,6 +98,8 @@ class Game extends Component
         $this->board->play($card);
         $this->currentTurnPlayerHand()->removeCard($card);
 
+        $this->handCounts[$this->playerKey()] -= 1;
+
         $this->checkForWinner();
 
         $this->nextPlayer();
@@ -144,9 +146,10 @@ class Game extends Component
     private function fetchFromCache(): void
     {
         $hands = Cache::get("games.$this->code.hands");
+        $this->hand = $hands[$this->playerKey()];
 
         $this->board = Cache::get("games.$this->code.board");
-        $this->hand = $hands[$this->playerKey()];
+        $this->handCounts = Cache::get("games.$this->code.handCounts");
         $this->currentTurnPlayerId = Cache::get("games.$this->code.currentTurnPlayerId");
     }
 
@@ -158,6 +161,7 @@ class Game extends Component
 
         Cache::put("games.$this->code.board", $this->board);
         Cache::put("games.$this->code.hands", $hands);
+        Cache::put("games.$this->code.handCounts", $this->handCounts);
         Cache::put("games.$this->code.currentTurnPlayerId", $this->currentTurnPlayerId);
     }
 
@@ -166,10 +170,16 @@ class Game extends Component
         $this->board = Board::make();
         $hands = Deck::splitIntoHands(players: $this->size, names: $this->players);
 
+        $this->handCounts = array_map(
+            fn(Hand $hand) => count($hand->cards),
+            $hands,
+        );
+
         $this->currentTurnPlayerId = $this->determineFirstTurnPlayer($hands);
 
         Cache::put("games.$this->code.board", $this->board);
         Cache::put("games.$this->code.hands", $hands);
+        Cache::put("games.$this->code.handCounts", $this->handCounts);
         Cache::put("games.$this->code.currentTurnPlayerId", $this->currentTurnPlayerId);
 
         Log::info("[$this->code] Set Up");

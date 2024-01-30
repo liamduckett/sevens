@@ -1,5 +1,6 @@
 @php
     /** @var \App\Models\Hand $hand  */
+    /** @var array $handCounts */
     /** @var int $currentTurnPlayerId  */
     /** @var \App\Models\Board $board  */
     /** @var ?int $winner */
@@ -8,7 +9,7 @@
 @endphp
 
 <div class="max-w-5xl mx-auto flex flex-col gap-10 py-10">
-    <x-board :board="$board" :hand="$hand" :names="$players"/>
+    <x-board :board="$board" :hand="$hand" :hand-counts="$handCounts" :names="$players"/>
 
     @php
         $name = Session::get('playerId');
